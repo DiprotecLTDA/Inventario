@@ -1,0 +1,47 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Config local del proyecto
+/Inventario/
+
+# Build outputs (todos los módulos)
+build/
+.kotlin/
+
+# Salidas de APK/artefactos generados
+/app/debug/
+/app/release/
+/app/free/
+*.apk
+*.aab
+*.dm
+
+# Credenciales de firma y llaves — NUNCA versionar
+*.jks
+*.keystore
+*.pem
+*.key
+keystore.properties
+signing.properties
+keystoresign/
+
+# Volcados y logs de la JVM / crashes
+hs_err_pid*.log
+*.hprof
+replay_pid*.log
+
+# Logs
+*.log

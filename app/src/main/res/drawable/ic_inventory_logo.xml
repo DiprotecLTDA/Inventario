@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Soft gray backing circle -->
+    <path
+        android:fillColor="#E6E8EB"
+        android:pathData="M54,54 m-38,0 a38,38 0,1 0,76 0 a38,38 0,1 0,-76 0"/>
+
+    <!-- Main red circle -->
+    <path
+        android:fillColor="#EF334D"
+        android:pathData="M54,54 m-31.5,0 a31.5,31.5 0,1 0,63 0 a31.5,31.5 0,1 0,-63 0"/>
+
+    <!-- Bottom left white box -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,49 L51,49 L51,72 L30,72 Z"/>
+
+    <!-- Bottom right white box -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M57,49 L78,49 L78,72 L57,72 Z"/>
+
+    <!-- Top white box -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M43,25 L65,25 L65,48 L43,48 Z"/>
+
+    <!-- Red detail lines inside boxes -->
+    <path
+        android:fillColor="#EF334D"
+        android:pathData="M36,59 L47,59 L47,62 L36,62 Z"/>
+    <path
+        android:fillColor="#EF334D"
+        android:pathData="M63,59 L74,59 L74,62 L63,62 Z"/>
+    <path
+        android:fillColor="#EF334D"
+        android:pathData="M49,34 L60,34 L60,37 L49,37 Z"/>
+</vector>
