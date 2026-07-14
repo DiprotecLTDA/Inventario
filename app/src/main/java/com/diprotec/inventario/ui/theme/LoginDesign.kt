@@ -89,7 +89,7 @@ fun LoginDesignScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp, vertical = 18.dp)
+                        .padding(horizontal = Dimens.spaceXxl, vertical = 18.dp)
                         .navigationBarsPadding(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -101,7 +101,7 @@ fun LoginDesignScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Dimens.spaceS))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -155,7 +155,7 @@ fun LoginDesignScreen(
                             }
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimens.spaceL))
 
                     LoginInputField(
                         value = state.password,
@@ -274,7 +274,7 @@ private fun LoginHeader(
         Row(
             modifier = Modifier
                 .height(brandHeight)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = Dimens.spaceXxl),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -336,8 +336,8 @@ private fun LoginInputField(
         textStyle = MaterialTheme.typography.titleMedium.copy(
             color = TextPrimary
         ),
-        modifier = modifier.heightIn(min = 72.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.heightIn(min = Dimens.fieldTallHeight),
+        shape = MaterialTheme.shapes.medium,
         colors = inventoryTextFieldColors()
     )
 }
