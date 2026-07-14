@@ -127,15 +127,13 @@ Requisitos: JDK 17, Android SDK (compileSdk 34).
 # Debug
 ./gradlew assembleFreeDebug
 
-# Pruebas unitarias
-./gradlew testFreeDebugUnitTest
-
-# Pruebas instrumentadas (requiere dispositivo/emulador)
-./gradlew connectedFreeDebugAndroidTest
+# Release firmada (requiere keystore.properties, ver abajo)
+./gradlew assembleFreeRelease
 ```
 
-> El `signingConfig` de release apunta a un keystore local; ajústalo a tu entorno antes de
-> generar una build firmada.
+> **Firma:** copia `keystore.properties.example` a `keystore.properties` (no se versiona)
+> y completa `storeFile`, `storePassword`, `keyAlias` y `keyPassword`. Sin ese archivo,
+> las builds de release se generan sin firmar.
 
 ## Configuración inicial
 
@@ -145,6 +143,5 @@ Requisitos: JDK 17, Android SDK (compileSdk 34).
 
 ## Pruebas
 
-- **Unitarias:** `app/src/test` (ViewModels, servicios de sincronización, DataStore, lectura de key).
-- **Instrumentadas:** `app/src/androidTest` (pantallas de captura y listado), basadas en
-  `testTag` estables sobre los componentes de Compose.
+El proyecto actualmente **no incluye una suite de pruebas automatizadas**. La validación se
+realiza de forma manual sobre el dispositivo (compilación, captura y sincronización).

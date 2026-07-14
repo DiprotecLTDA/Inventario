@@ -47,6 +47,30 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   catálogos locales sin uso (`ProductCatalog`, `UnitCatalog`, `CatalogModels`),
   y utilidades sin uso (`TextFormatter`, `HashExt`/`String.sha256()`,
   `NetworkUsageCallFactory`).
+- **Suite de pruebas completa** y toda su configuración:
+  - 10 pruebas unitarias (`app/src/test/`): `ActivateDeviceServiceTest`,
+    `CaptureInventoryViewModelFinalizeTest`, `KeyFileReaderUnitTest`,
+    `LoginViewModelSyncTest`, `MainDispatcherRule`, `SettingsViewModelSaveTest`,
+    `SettingsViewModelValidationTest`, `SyncServiceCatalogFailureTest`,
+    `SyncServicePendingInventoryTest`, `SyncServiceTest`.
+  - 4 pruebas instrumentadas (`app/src/androidTest/`): `CaptureInventoryScreenTest`,
+    `InventoryListScreenTest`, `KeyFileReaderInstrumentedTest`,
+    `SettingsDataStoreInstrumentedTest`.
+  - En `app/build.gradle.kts`: `testInstrumentationRunner`, el bloque `testOptions`
+    y todas las dependencias `testImplementation`/`androidTestImplementation`
+    (JUnit, MockK, Robolectric, Espresso, coroutines-test, compose ui-test) y los
+    `debugImplementation` de `ui-test-manifest`.
+
+### Seguridad
+- Firma de release externalizada a `keystore.properties` (ignorada); se agregó la
+  plantilla `keystore.properties.example`. El keystore `.jks` y las contraseñas de
+  firma dejaron de estar versionados.
+
+### Infraestructura
+- `.gitignore` alineado a repositorio solo-fuente: ignora `*.apk/*.aab/*.dm`,
+  `build/`, `/app/{free,debug,release}/`, `*.jks/*.keystore`, `keystore.properties`
+  y logs de JVM. Regla `/Inventario/` anclada para no ignorar el paquete `inventario/`.
+- Se dejaron de versionar los artefactos de build (`app/free/release/*`).
 
 ## [1.4.2]
 
