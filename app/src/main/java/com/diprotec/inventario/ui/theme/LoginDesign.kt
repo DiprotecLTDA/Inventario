@@ -249,24 +249,6 @@ fun LoginDesignScreen(
                     }
 
                     Spacer(modifier = Modifier.height(18.dp))
-
-                    state.errorMessage?.let {
-                        Text(
-                            text = it,
-                            color = StatusError,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    state.successMessage?.let {
-                        Text(
-                            text = it,
-                            color = StatusOnline,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                 }
             }
         }
