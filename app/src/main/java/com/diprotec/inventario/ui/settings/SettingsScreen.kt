@@ -54,6 +54,7 @@ import com.diprotec.inventario.ui.common.AppFloatingMessage
 import com.diprotec.inventario.ui.components.AppPrimaryButton
 import com.diprotec.inventario.ui.components.InventoryTopBar
 import com.diprotec.inventario.ui.components.inventoryTextFieldColors
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
 import com.diprotec.inventario.ui.theme.SuccessBg
@@ -151,7 +152,7 @@ fun SettingsScreen(
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
                 .imePadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = Dimens.spaceXl, vertical = Dimens.spaceL),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             SettingsStatusHeader(
@@ -159,7 +160,7 @@ fun SettingsScreen(
                 deviceActivated = deviceActivated
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceXxl))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -191,7 +192,7 @@ fun SettingsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceXxl))
         }
     }
 }
@@ -203,7 +204,7 @@ private fun SettingsStatusHeader(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimens.spaceM)
     ) {
         Text(
             text = "Estado del dispositivo",
@@ -291,11 +292,11 @@ private fun SettingsTextField(
             )
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = inventoryTextFieldColors(),
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
+            .height(Dimens.fieldTallHeight)
             .testTag(testTag)
     )
 }
@@ -309,15 +310,15 @@ private fun StatusBanner(
         modifier = Modifier
             .fillMaxWidth()
             .background(SuccessBg, RoundedCornerShape(12.dp))
-            .border(1.dp, SuccessBorder, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .border(Dimens.borderThin, SuccessBorder, RoundedCornerShape(12.dp))
+            .padding(horizontal = Dimens.spaceM, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Check,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(Dimens.iconS)
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -342,7 +343,7 @@ private fun NeutralStatus(
             imageVector = Icons.Default.Info,
             contentDescription = null,
             tint = LabelGray,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(Dimens.iconS)
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -362,8 +363,8 @@ private fun SettingsBottomActions(
     onSave: () -> Unit
 ) {
     Surface(
-        tonalElevation = 4.dp,
-        shadowElevation = 8.dp,
+        tonalElevation = Dimens.elevationM,
+        shadowElevation = Dimens.elevationL,
         color = MaterialTheme.colorScheme.background
     ) {
         Row(
@@ -371,7 +372,7 @@ private fun SettingsBottomActions(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .imePadding()
-                .padding(horizontal = 20.dp, vertical = 14.dp),
+                .padding(horizontal = Dimens.spaceXl, vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Top
         ) {
