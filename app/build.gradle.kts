@@ -26,8 +26,8 @@ ksp {
 }
 
 val majorVersion = 1
-val minorVersion = 4
-val patchVersion = 2
+val minorVersion = 0
+val patchVersion = 0
 
 val versionCodeResult = majorVersion * 10000 + minorVersion * 100 + patchVersion
 val versionNameString = "$majorVersion.$minorVersion.$patchVersion"
@@ -92,7 +92,7 @@ android {
     applicationVariants.all {
         outputs.all {
             val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            outputImpl.outputFileName = "inventario-$versionNameString.apk"
+            outputImpl.outputFileName = "unitech_520_inventario_$versionNameString.apk"
         }
     }
 
