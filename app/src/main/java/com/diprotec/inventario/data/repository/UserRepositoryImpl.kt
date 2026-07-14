@@ -40,8 +40,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun replaceAllUsers(list: List<UserEntity>) {
-        userDao.clearAll()
-        userDao.upsertAll(list)
+        userDao.replaceAll(list)
     }
 
     override fun observeUsers(): Flow<List<UserEntity>> = userDao.observeAll()
