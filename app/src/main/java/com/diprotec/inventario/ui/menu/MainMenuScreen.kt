@@ -11,13 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataUsage
@@ -32,7 +29,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,11 +45,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.common.AppFloatingMessage
+import com.diprotec.inventario.ui.components.StatusChip
 import com.diprotec.inventario.ui.connection.AppConnectionMode
 import com.diprotec.inventario.ui.connection.ConnectionModeIndicator
 import com.diprotec.inventario.ui.syncstatus.WorkerTrafficLight
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BrandPrimary
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
@@ -106,7 +104,7 @@ fun MainMenuScreen(
                 .background(Background)
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 14.dp),
+                .padding(horizontal = Dimens.spaceXl, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -119,7 +117,7 @@ fun MainMenuScreen(
                 ) {
                     ConnectionModeIndicator()
 
-                    Spacer(modifier = Modifier.size(6.dp))
+                    Spacer(modifier = Modifier.size(Dimens.spaceXs))
 
                     SessionTimeIndicator(
                         value = sessionRemainingText
@@ -127,7 +125,7 @@ fun MainMenuScreen(
                 }
 
                 if (showWorkerTrafficLight) {
-                    Spacer(modifier = Modifier.size(8.dp))
+                    Spacer(modifier = Modifier.size(Dimens.spaceS))
 
                     WorkerTrafficLight()
                 }
@@ -137,7 +135,7 @@ fun MainMenuScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(top = 14.dp, bottom = 8.dp),
+                    .padding(top = 14.dp, bottom = Dimens.spaceS),
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -266,44 +264,12 @@ private fun SessionTimeIndicator(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    StatusChip(
+        dotColor = BrandPrimary,
+        title = "Sesión",
+        value = value,
         modifier = modifier
-            .widthIn(min = 150.dp)
-            .heightIn(min = 40.dp),
-        shape = RoundedCornerShape(18.dp),
-        tonalElevation = 1.dp,
-        shadowElevation = 1.dp
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(12.dp)
-                    .background(BrandPrimary, CircleShape)
-            )
-
-            Spacer(modifier = Modifier.size(8.dp))
-
-            Text(
-                text = "Sesión:",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
-            )
-
-            Spacer(modifier = Modifier.size(6.dp))
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1
-            )
-        }
-    }
+    )
 }
 
 @Composable
@@ -324,13 +290,13 @@ private fun BlockingPendingSyncOverlay() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = Dimens.spaceXxxl),
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(
                 containerColor = White
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = Dimens.elevationL
             )
         ) {
             Column(
@@ -346,7 +312,7 @@ private fun BlockingPendingSyncOverlay() {
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.size(12.dp))
+                Spacer(modifier = Modifier.size(Dimens.spaceM))
 
                 Text(
                     text = "Sincronizando inventarios pendientes…",
@@ -360,7 +326,7 @@ private fun BlockingPendingSyncOverlay() {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.size(12.dp))
+                Spacer(modifier = Modifier.size(Dimens.spaceM))
 
                 Text(
                     text = "Por favor espera",
