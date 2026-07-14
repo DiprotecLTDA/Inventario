@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,6 +37,7 @@ import com.diprotec.inventario.ui.components.AppPrimaryButton
 import com.diprotec.inventario.ui.components.InventoryTopBar
 import com.diprotec.inventario.ui.components.OutlinedInfoCard
 import com.diprotec.inventario.ui.theme.Background
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
 import com.diprotec.inventario.ui.update.StartupUpdateDialog
@@ -110,11 +110,11 @@ fun AboutScreen(
                 .fillMaxSize()
                 .navigationBarsPadding()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp, vertical = 18.dp),
+                .padding(horizontal = Dimens.spaceXl, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Surface(
-                shape = RoundedCornerShape(24.dp),
+                shape = MaterialTheme.shapes.large,
                 color = White,
                 modifier = Modifier.size(120.dp)
             ) {
@@ -141,7 +141,7 @@ fun AboutScreen(
                 enabled = !s.loading && s.canCheckUpdates,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)
+                    .height(Dimens.buttonHeight)
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -166,7 +166,7 @@ fun AboutScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceXxl))
         }
     }
 
@@ -204,13 +204,13 @@ private fun AboutRow(
             color = TextPrimary
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(Dimens.spaceXxs))
 
         OutlinedInfoCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 64.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+            contentPadding = PaddingValues(horizontal = Dimens.spaceL, vertical = 14.dp)
         ) {
             Text(
                 text = value,
