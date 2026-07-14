@@ -1,6 +1,7 @@
 package com.diprotec.inventario.data.repository
 
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.dao.UnitMeasureDao
 import com.diprotec.inventario.data.local.entity.UnitMeasureEntity
@@ -20,7 +21,7 @@ class UnitMeasureRepositoryImpl @Inject constructor(
 
     override suspend fun fetchRemoteUnidadMedidas(): List<UnidadMedidaDto> {
         val empresaRut = settings.empresaRut.value.trim()
-        require(empresaRut.isNotBlank()) { "Empresa RUT no configurado" }
+        require(empresaRut.isNotBlank()) { AppMessages.Configuration.EMPRESA_RUT_NO_CONFIGURADO }
 
         val relativeUrl = "/api/website/v1/unidadmedidas/$empresaRut/GetUnidadMedidas"
         val headers = headersBuilder.build(

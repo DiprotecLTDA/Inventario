@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.device.GetSerialNumber
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.entity.SyncLogEntity
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
@@ -53,7 +54,7 @@ class SyncService @Inject constructor(
 
     private fun authorizationHeader(): String {
         val token = settings.authToken.value.trim()
-        require(token.isNotBlank()) { "Authorization no configurado" }
+        require(token.isNotBlank()) { AppMessages.Configuration.AUTHORIZATION_NO_CONFIGURADO }
         return "Bearer $token"
     }
 
@@ -62,9 +63,9 @@ class SyncService @Inject constructor(
         val apiKey = settings.apiKey.value.trim()
         val authToken = settings.authToken.value.trim()
 
-        require(empresaRut.isNotBlank()) { "Empresa RUT no configurado" }
-        require(apiKey.isNotBlank()) { "X-API-KEY no configurada" }
-        require(authToken.isNotBlank()) { "Authorization no configurado" }
+        require(empresaRut.isNotBlank()) { AppMessages.Configuration.EMPRESA_RUT_NO_CONFIGURADO }
+        require(apiKey.isNotBlank()) { AppMessages.Configuration.API_KEY_NO_CONFIGURADA }
+        require(authToken.isNotBlank()) { AppMessages.Configuration.AUTHORIZATION_NO_CONFIGURADO }
     }
 
     private fun requireActivated() {
@@ -118,11 +119,19 @@ class SyncService @Inject constructor(
                 ?: throw IllegalStateException("LoginDispositivo sin body")
 
             if (resp.Estado != 200 || resp.Data.isNullOrBlank()) {
-                throw IllegalStateException(
+                val serverMessage = resp.Respuesta?.trim().orEmpty()
+                val userMessage = serverMessage.ifBlank {
+                    AppMessages.ERROR_SERVIDOR_GENERICO
+                }
+
+                Log.w(
+                    TAG,
                     "LoginDispositivo Estado=${resp.Estado} " +
                             "Respuesta=${resp.Respuesta} " +
                             "CodigoError=${resp.CodigoError}"
                 )
+
+                throw IllegalStateException(userMessage)
             }
 
             settings.saveDeviceSession(resp.Data)
@@ -335,6 +344,10 @@ class SyncService @Inject constructor(
                     val ids = capturas.map { it.id }
                     inventoryRepository.markCapturasSincronizadas(ids)
                     totalSincronizadas += ids.size
+                    val successMessage = response.Respuesta
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
+                        ?: AppMessages.ApiSync.CAPTURAS_ENVIADAS_CORRECTAMENTE
 
                     insertSyncLog(
                         remoteInventoryId = inventarioId,
@@ -344,7 +357,7 @@ class SyncService @Inject constructor(
                         inventoryStatus = inventoryStatus,
                         result = RESULT_ENVIADO,
                         connectionMode = MODE_ONLINE_API,
-                        message = "Capturas enviadas correctamente"
+                        message = successMessage
                     )
 
                     Log.d(
@@ -352,9 +365,16 @@ class SyncService @Inject constructor(
                         "Inventario $inventarioId sincronizado. RutUsuario=$rutUsuario Capturas=${ids.size}"
                     )
                 } else {
-                    val message =
+                    val serverMessage = response.Respuesta?.trim().orEmpty()
+                    val userMessage = serverMessage.ifBlank {
+                        AppMessages.ERROR_SERVIDOR_GENERICO
+                    }
+
+                    Log.w(
+                        TAG,
                         "SendRegistroInventario falló. Estado=${response.Estado}, " +
                                 "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
+                    )
 
                     insertSyncLog(
                         remoteInventoryId = inventarioId,
@@ -364,11 +384,11 @@ class SyncService @Inject constructor(
                         inventoryStatus = inventoryStatus,
                         result = RESULT_ERROR,
                         connectionMode = MODE_ONLINE_API,
-                        message = message
+                        message = userMessage
                     )
 
                     failureLogged = true
-                    throw IllegalStateException(message)
+                    throw IllegalStateException(userMessage)
                 }
             } catch (t: Throwable) {
                 if (!failureLogged) {
@@ -452,6 +472,10 @@ class SyncService @Inject constructor(
                 if (response.Estado in 200..299) {
                     inventoryRepository.markFinishSynced(inventory.id)
                     total++
+                    val successMessage = response.Respuesta
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
+                        ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
 
                     insertSyncLog(
                         remoteInventoryId = inventory.remoteInventoryId,
@@ -463,7 +487,7 @@ class SyncService @Inject constructor(
                         inventoryStatus = InventoryStatus.FINISHED.name,
                         result = RESULT_ENVIADO,
                         connectionMode = MODE_ONLINE_API,
-                        message = "Inventario finalizado correctamente"
+                        message = successMessage
                     )
 
                     Log.d(
@@ -471,9 +495,16 @@ class SyncService @Inject constructor(
                         "FinishInventario OK. localId=${inventory.id}, remoteId=${inventory.remoteInventoryId}, rutUsuario=$rutUsuario"
                     )
                 } else {
-                    val message =
+                    val serverMessage = response.Respuesta?.trim().orEmpty()
+                    val userMessage = serverMessage.ifBlank {
+                        AppMessages.ERROR_SERVIDOR_GENERICO
+                    }
+
+                    Log.w(
+                        TAG,
                         "FinishInventario falló. Estado=${response.Estado}, " +
                                 "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
+                    )
 
                     insertSyncLog(
                         remoteInventoryId = inventory.remoteInventoryId,
@@ -485,11 +516,11 @@ class SyncService @Inject constructor(
                         inventoryStatus = inventory.status,
                         result = RESULT_ERROR,
                         connectionMode = MODE_ONLINE_API,
-                        message = message
+                        message = userMessage
                     )
 
                     failureLogged = true
-                    throw IllegalStateException(message)
+                    throw IllegalStateException(userMessage)
                 }
             } catch (t: Throwable) {
                 if (!failureLogged) {
@@ -556,6 +587,10 @@ class SyncService @Inject constructor(
 
             if (response.Estado in 200..299) {
                 inventoryRepository.markFinishSynced(inventory.id)
+                val successMessage = response.Respuesta
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
 
                 insertSyncLog(
                     remoteInventoryId = inventory.remoteInventoryId,
@@ -567,14 +602,21 @@ class SyncService @Inject constructor(
                     inventoryStatus = InventoryStatus.FINISHED.name,
                     result = RESULT_ENVIADO,
                     connectionMode = MODE_ONLINE_API,
-                    message = "Inventario finalizado correctamente"
+                    message = successMessage
                 )
 
                 true
             } else {
-                val message =
+                val serverMessage = response.Respuesta?.trim().orEmpty()
+                val userMessage = serverMessage.ifBlank {
+                    AppMessages.ERROR_SERVIDOR_GENERICO
+                }
+
+                Log.w(
+                    TAG,
                     "FinishInventario falló. Estado=${response.Estado}, " +
                             "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
+                )
 
                 insertSyncLog(
                     remoteInventoryId = inventory.remoteInventoryId,
@@ -586,11 +628,11 @@ class SyncService @Inject constructor(
                     inventoryStatus = inventory.status,
                     result = RESULT_ERROR,
                     connectionMode = MODE_ONLINE_API,
-                    message = message
+                    message = userMessage
                 )
 
                 failureLogged = true
-                throw IllegalStateException(message)
+                throw IllegalStateException(userMessage)
             }
         } catch (t: Throwable) {
             if (!failureLogged) {

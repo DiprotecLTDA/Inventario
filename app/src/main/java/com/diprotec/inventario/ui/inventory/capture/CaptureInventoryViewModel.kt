@@ -2,12 +2,13 @@ package com.diprotec.inventario.ui.inventory.capture
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diprotec.inventario.service.SyncService
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.data.local.entity.InventoryEntity
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
 import com.diprotec.inventario.data.repository.InventoryRepository
 import com.diprotec.inventario.data.repository.UnitMeasureRepository
+import com.diprotec.inventario.service.SyncService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -141,7 +142,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
             if (inventory == null) {
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = "No se encontró el inventario",
+                    errorMessage = AppMessages.Inventory.NO_ENCONTRADO,
                     successMessage = null
                 )
                 return@launch
@@ -233,7 +234,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (state.inventoryStatus != InventoryStatus.PENDING.name) {
             _uiState.value = state.copy(
-                errorMessage = "El inventario no está pendiente",
+                errorMessage = AppMessages.Inventory.NO_ESTA_PENDIENTE,
                 successMessage = null
             )
             return
@@ -260,7 +261,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (_uiState.value.inventoryStatus != InventoryStatus.PENDING.name) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "El inventario no está pendiente",
+                errorMessage = AppMessages.Inventory.NO_ESTA_PENDIENTE,
                 successMessage = null
             )
             return
@@ -327,7 +328,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (state.inventoryStatus != InventoryStatus.PENDING.name) {
             _uiState.value = state.copy(
-                errorMessage = "El inventario no está pendiente",
+                errorMessage = AppMessages.Inventory.NO_ESTA_PENDIENTE,
                 successMessage = null
             )
             return
@@ -337,7 +338,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (barcode.isBlank()) {
             _uiState.value = state.copy(
-                errorMessage = "Debe escanear o ingresar un código",
+                errorMessage = AppMessages.Inventory.DEBE_INGRESAR_CODIGO,
                 successMessage = null
             )
             return
@@ -345,7 +346,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (barcode.length > MAX_BARCODE_LENGTH) {
             _uiState.value = state.copy(
-                errorMessage = "El código no puede superar los 50 caracteres",
+                errorMessage = AppMessages.Inventory.CODIGO_DEMASIADO_LARGO,
                 successMessage = null
             )
             return
@@ -353,7 +354,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (!barcode.all { it.isLetterOrDigit() }) {
             _uiState.value = state.copy(
-                errorMessage = "El código solo puede contener letras y números",
+                errorMessage = AppMessages.Inventory.CODIGO_INVALIDO,
                 successMessage = null
             )
             return
@@ -361,7 +362,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (state.selectedUbicacionId.isBlank()) {
             _uiState.value = state.copy(
-                errorMessage = "Debe seleccionar una ubicación",
+                errorMessage = AppMessages.Inventory.DEBE_SELECCIONAR_UBICACION,
                 successMessage = null
             )
             return
@@ -376,7 +377,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
                 if (value == null || value <= 0.0) {
                     _uiState.value = state.copy(
-                        errorMessage = "Ingrese una cantidad válida mayor a 0",
+                        errorMessage = AppMessages.Inventory.CANTIDAD_INVALIDA,
                         successMessage = null
                     )
                     return
@@ -390,7 +391,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (unitId.isBlank()) {
             _uiState.value = state.copy(
-                errorMessage = "Debe seleccionar una unidad de medida",
+                errorMessage = AppMessages.Inventory.DEBE_SELECCIONAR_UNIDAD,
                 successMessage = null
             )
             return
@@ -400,7 +401,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
         if (rutUsuario.isBlank()) {
             _uiState.value = state.copy(
-                errorMessage = "No hay usuario logueado",
+                errorMessage = AppMessages.Inventory.SIN_USUARIO,
                 successMessage = null
             )
             return
@@ -425,7 +426,7 @@ class CaptureInventoryViewModel @Inject constructor(
                 description = state.description,
                 quantityInput = state.quantityInput,
                 errorMessage = null,
-                successMessage = "Producto registrado",
+                successMessage = AppMessages.Inventory.PRODUCTO_REGISTRADO,
                 successMessageId = System.nanoTime()
             )
         }
@@ -440,7 +441,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
             if (rutUsuario.isBlank()) {
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = "No hay usuario logueado",
+                    errorMessage = AppMessages.Inventory.SIN_USUARIO,
                     successMessage = null
                 )
                 return@launch
@@ -457,7 +458,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
             _uiState.value = _uiState.value.copy(
                 inventoryStatus = InventoryStatus.FINISHED.name,
-                successMessage = "Inventario finalizado localmente",
+                successMessage = AppMessages.Inventory.FINALIZADO_LOCALMENTE,
                 successMessageId = System.nanoTime(),
                 errorMessage = null
             )
@@ -474,7 +475,7 @@ class CaptureInventoryViewModel @Inject constructor(
 
             syncResult.onFailure { t ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = "Finalizado localmente. Pendiente de sincronizar cierre: ${t.message}",
+                    errorMessage = AppMessages.Inventory.cierrePendiente(t.message),
                     successMessage = null
                 )
             }

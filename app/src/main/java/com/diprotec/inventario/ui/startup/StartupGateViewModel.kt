@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.data.local.dao.LocationDao
 import com.diprotec.inventario.data.local.dao.RuleDao
@@ -24,7 +25,7 @@ import kotlinx.coroutines.withContext
 
 data class StartupGateUiState(
     val loading: Boolean = true,
-    val message: String = "Verificando aplicación…",
+    val message: String = AppMessages.Startup.VERIFICANDO_APLICACION,
     val error: String? = null,
     val waitingForUpdate: Boolean = false,
     val goLogin: Boolean = false,
@@ -63,8 +64,8 @@ class StartupGateViewModel @Inject constructor(
         if (!hasBase || !hasEmpresa || !hasApiKey || !hasAuth) {
             _state.value = _state.value.copy(
                 loading = false,
-                message = "Faltan parámetros de configuración.",
-                error = "Faltan parámetros (Base URL / Empresa / API Key / Authorization). Configure la app.",
+                message = AppMessages.Configuration.FALTAN_PARAMETROS,
+                error = AppMessages.Configuration.FALTAN_PARAMETROS_DETALLE,
                 goSettings = true,
                 canContinueOffline = false
             )
@@ -74,8 +75,8 @@ class StartupGateViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             _state.value = _state.value.copy(
                 loading = false,
-                message = "Dispositivo no activado.",
-                error = "El dispositivo no está activado. Debe activarlo en Configuración.",
+                message = AppMessages.Device.NO_ACTIVADO_CORTO,
+                error = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
                 goSettings = true,
                 canContinueOffline = false
             )
@@ -85,7 +86,7 @@ class StartupGateViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value.copy(
                 loading = true,
-                message = "Preparando sesión del dispositivo…",
+                message = AppMessages.Startup.PREPARANDO_SESION,
                 error = null,
                 waitingForUpdate = false,
                 goLogin = false,
@@ -99,7 +100,7 @@ class StartupGateViewModel @Inject constructor(
                     sync.warmUpDeviceSession()
 
                     _state.value = _state.value.copy(
-                        message = "Consultando actualización…"
+                        message = AppMessages.Startup.CONSULTANDO_ACTUALIZACION
                     )
 
                     sync.checkStartupUpdateAndSavePending()
@@ -111,14 +112,14 @@ class StartupGateViewModel @Inject constructor(
 
                 if (canWorkOffline()) {
                     showOfflineOption(
-                        message = "Sin conexión a internet.",
-                        error = "No se pudo verificar la aplicación. Puede continuar trabajando offline con los datos almacenados."
+                        message = AppMessages.Startup.SIN_CONEXION,
+                        error = AppMessages.Startup.NO_SE_PUDO_VERIFICAR_OFFLINE
                     )
                 } else {
                     _state.value = _state.value.copy(
                         loading = false,
-                        message = "No se pudo verificar la aplicación.",
-                        error = t.message ?: "No se pudo verificar la aplicación.",
+                        message = AppMessages.Startup.NO_SE_PUDO_VERIFICAR,
+                        error = t.message ?: AppMessages.Startup.NO_SE_PUDO_VERIFICAR,
                         goLogin = false,
                         goMainMenu = false,
                         goSettings = false,
@@ -138,9 +139,9 @@ class StartupGateViewModel @Inject constructor(
                     _state.value = _state.value.copy(
                         loading = false,
                         message = if (update.mandatory) {
-                            "Actualización obligatoria disponible."
+                            AppMessages.Startup.ACTUALIZACION_OBLIGATORIA
                         } else {
-                            "Nueva versión disponible."
+                            AppMessages.Startup.NUEVA_VERSION
                         },
                         error = null,
                         waitingForUpdate = true,
@@ -186,14 +187,14 @@ class StartupGateViewModel @Inject constructor(
             goMainMenu = false,
             goSettings = false,
             canContinueOffline = false,
-            message = "Descargando actualización…"
+            message = AppMessages.Startup.DESCARGANDO_ACTUALIZACION
         )
     }
 
     private suspend fun continueToLogin() {
         _state.value = _state.value.copy(
             loading = true,
-            message = "Sincronizando usuarios…",
+            message = AppMessages.Startup.SINCRONIZANDO_USUARIOS,
             error = null,
             waitingForUpdate = false,
             goLogin = false,
@@ -213,14 +214,14 @@ class StartupGateViewModel @Inject constructor(
 
             if (canWorkOffline()) {
                 showOfflineOption(
-                    message = "Sin conexión a internet.",
-                    error = "No se pudo sincronizar usuarios. Puede continuar trabajando offline con los datos almacenados."
+                    message = AppMessages.Startup.SIN_CONEXION,
+                    error = AppMessages.Startup.NO_SE_PUDO_SINCRONIZAR_USUARIOS_OFFLINE
                 )
             } else {
                 _state.value = _state.value.copy(
                     loading = false,
-                    message = "No se pudo sincronizar usuarios.",
-                    error = t.message ?: "No se pudo sincronizar usuarios.",
+                    message = AppMessages.Startup.NO_SE_PUDO_SINCRONIZAR_USUARIOS,
+                    error = t.message ?: AppMessages.Startup.NO_SE_PUDO_SINCRONIZAR_USUARIOS,
                     goLogin = false,
                     goMainMenu = false,
                     goSettings = false,
@@ -277,7 +278,11 @@ class StartupGateViewModel @Inject constructor(
 
         _state.value = _state.value.copy(
             loading = false,
-            message = if (offline) "Modo offline." else "Aplicación lista.",
+            message = if (offline) {
+                AppMessages.Startup.MODO_OFFLINE
+            } else {
+                AppMessages.Startup.APLICACION_LISTA
+            },
             error = null,
             waitingForUpdate = false,
             goLogin = !hasValidSession,

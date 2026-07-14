@@ -2,6 +2,7 @@ package com.diprotec.inventario.ui.inventory.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.data.local.entity.InventoryItemEntity
 import com.diprotec.inventario.data.local.inventory.InventoryGroupedRow
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
@@ -58,7 +59,7 @@ class InventoryListViewModel @Inject constructor(
                 canDeleteItems = canDeleteItems,
                 ungroupedItems = ungrouped,
                 groupedItems = grouped,
-                errorMessage = if (inventory == null) "No se encontró el inventario" else null
+                errorMessage = if (inventory == null) AppMessages.Inventory.NO_ENCONTRADO else null
             )
         }.stateIn(
             scope = viewModelScope,

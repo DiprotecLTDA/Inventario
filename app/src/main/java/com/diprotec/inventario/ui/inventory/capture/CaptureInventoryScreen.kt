@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.ui.common.AppFloatingMessage
 import com.diprotec.inventario.ui.scan.UnitechScan
 import com.diprotec.inventario.ui.theme.AppPrimaryButton
@@ -206,7 +207,7 @@ fun CaptureInventoryScreen(
     LaunchedEffect(uiState.successMessage, uiState.successMessageId) {
         val message = uiState.successMessage.orEmpty()
 
-        if (message == "Producto registrado") {
+        if (message == AppMessages.Inventory.PRODUCTO_REGISTRADO) {
             val modeAtSuccess = uiState.scanMode
 
             AppFloatingMessage.success(

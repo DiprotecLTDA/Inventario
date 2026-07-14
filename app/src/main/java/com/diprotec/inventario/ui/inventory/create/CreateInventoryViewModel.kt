@@ -3,6 +3,7 @@ package com.diprotec.inventario.ui.inventory.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.auth.SuperAdminAccess
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.data.local.entity.InventoryRemoteEntity
 import com.diprotec.inventario.data.repository.InventoryRemoteRepository
@@ -143,7 +144,7 @@ class CreateInventoryViewModel @Inject constructor(
                         selectedInicioTexto = selected?.inicioTexto.orEmpty(),
                         selectedTerminoTexto = selected?.terminoTexto.orEmpty(),
                         errorMessage = if (options.isEmpty()) {
-                            "No hay inventarios disponibles para crear"
+                            AppMessages.Inventory.SIN_INVENTARIOS_DISPONIBLES
                         } else {
                             null
                         }
@@ -171,7 +172,7 @@ class CreateInventoryViewModel @Inject constructor(
 
         if (rutUsuario.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "No hay usuario logueado"
+                errorMessage = AppMessages.Inventory.SIN_USUARIO
             )
             return
         }
@@ -181,7 +182,7 @@ class CreateInventoryViewModel @Inject constructor(
 
         if (selected == null) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Debe seleccionar un inventario"
+                errorMessage = AppMessages.Inventory.DEBE_SELECCIONAR_INVENTARIO
             )
             return
         }

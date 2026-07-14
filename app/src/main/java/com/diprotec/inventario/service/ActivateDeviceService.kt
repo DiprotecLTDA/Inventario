@@ -1,10 +1,14 @@
 package com.diprotec.inventario.service
 
+import android.util.Log
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.data.remote.api.ApiService
 import com.diprotec.inventario.data.remote.dto.ActivateDispositivoRequest
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "ActivateDevice"
 
 @Singleton
 class ActivateDeviceService @Inject constructor(
@@ -46,11 +50,19 @@ class ActivateDeviceService @Inject constructor(
             ?: throw IllegalStateException("ActivateDispositivo sin body")
 
         if (resp.Estado != 0 && resp.Estado != 200) {
-            throw IllegalStateException(
+            val serverMessage = resp.Respuesta?.trim().orEmpty()
+            val userMessage = serverMessage.ifBlank {
+                AppMessages.ERROR_SERVIDOR_GENERICO
+            }
+
+            Log.w(
+                TAG,
                 "ActivateDispositivo Estado=${resp.Estado} " +
                         "Respuesta=${resp.Respuesta} " +
                         "CodigoError=${resp.CodigoError}"
             )
+
+            throw IllegalStateException(userMessage)
         }
 
         val deviceId = extractDeviceId(resp.Data)

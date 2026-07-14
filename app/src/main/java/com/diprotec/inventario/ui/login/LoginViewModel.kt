@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.format.RutInput
 import com.diprotec.inventario.core.key.KeyFileReader
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.core.validator.RutValidator
 import com.diprotec.inventario.service.AuthResult
@@ -61,7 +62,7 @@ class LoginViewModel @Inject constructor(
         if (!hasBase || !hasEmpresa || !hasApiKey || !hasAuth) {
             state.value = state.value.copy(
                 loadingBoot = false,
-                error = "Faltan parámetros (Base URL / Empresa / API Key / Authorization). Configure la app.",
+                error = AppMessages.Configuration.FALTAN_PARAMETROS_DETALLE,
                 goToSettings = true
             )
             return
@@ -70,7 +71,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = state.value.copy(
                 loadingBoot = false,
-                error = "El dispositivo no está activado. Debe activarlo en Configuración.",
+                error = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
                 goToSettings = true
             )
             return
@@ -109,7 +110,7 @@ class LoginViewModel @Inject constructor(
             state.value = s.copy(
                 username = "",
                 loadingLogin = false,
-                error = "RUT inválido (dígito verificador incorrecto)."
+                error = AppMessages.Login.RUT_INVALIDO
             )
             return
         }
@@ -117,7 +118,7 @@ class LoginViewModel @Inject constructor(
         if (s.password.isBlank()) {
             state.value = s.copy(
                 loadingLogin = false,
-                error = "Ingrese la contraseña"
+                error = AppMessages.Login.INGRESE_CONTRASENA
             )
             return
         }
@@ -125,7 +126,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = s.copy(
                 loadingLogin = false,
-                error = "El dispositivo no está activado. Debe activarlo en Configuración.",
+                error = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
                 goToSettings = true
             )
             return
@@ -163,7 +164,7 @@ class LoginViewModel @Inject constructor(
                     state.value = state.value.copy(
                         loadingLogin = false,
                         error = null,
-                        info = "Ingreso exitoso"
+                        info = AppMessages.Login.INGRESO_EXITOSO
                     )
 
                     onLoggedIn()
@@ -186,7 +187,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = s.copy(
                 loadingSync = false,
-                error = "El dispositivo no está activado",
+                error = AppMessages.Device.NO_ACTIVADO,
                 goToSettings = true
             )
             return
@@ -218,7 +219,11 @@ class LoginViewModel @Inject constructor(
 
             state.value = state.value.copy(
                 loadingSync = false,
-                info = "Usuarios: $users | Capturas enviadas: ${inventarioSync.capturas} | Cierres enviados: ${inventarioSync.finalizados}"
+                info = AppMessages.Login.resumenSincronizacion(
+                    users = users,
+                    capturas = inventarioSync.capturas,
+                    finalizados = inventarioSync.finalizados
+                )
             )
         }
     }
@@ -234,7 +239,7 @@ class LoginViewModel @Inject constructor(
             if (raw.isNullOrBlank()) {
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = "No pude leer el archivo seleccionado."
+                    error = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO
                 )
                 return@launch
             }
@@ -245,7 +250,7 @@ class LoginViewModel @Inject constructor(
             if (tokenFromFile.isNullOrBlank() || apiKeyFromFile.isNullOrBlank()) {
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = "El archivo no contiene authToken/apiKey válidos."
+                    error = AppMessages.Credentials.ARCHIVO_SIN_CREDENCIALES_VALIDAS
                 )
                 return@launch
             }
@@ -265,7 +270,7 @@ class LoginViewModel @Inject constructor(
                 android.util.Log.e("LOGIN_BOOT", "settings.save failed", t)
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = "No pude guardar credenciales: ${t.message}"
+                    error = AppMessages.Credentials.noSePudoGuardar(t.message)
                 )
                 return@launch
             }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.AppConnectionMonitor
 import com.diprotec.inventario.data.remote.dto.VersionCheckDataDto
 import com.diprotec.inventario.service.VersionService
@@ -76,7 +77,7 @@ class AboutViewModel @Inject constructor(
                     connectionMode = mode,
                     canCheckUpdates = false,
                     versionCheck = null,
-                    error = "Sin conexión a internet. No se puede consultar versión.",
+                    error = AppMessages.About.SIN_CONEXION_CONSULTAR_VERSION,
                     info = null,
                     hasNewVersion = false,
                     isMandatoryUpdate = false,
@@ -127,15 +128,15 @@ class AboutViewModel @Inject constructor(
                         error = null,
                         info = when {
                             hasNewVersion && isMandatoryUpdate -> {
-                                "Se encontró una actualización obligatoria."
+                                AppMessages.About.ACTUALIZACION_OBLIGATORIA_ENCONTRADA
                             }
 
                             hasNewVersion -> {
-                                "Se encontró una actualización opcional."
+                                AppMessages.About.ACTUALIZACION_OPCIONAL_ENCONTRADA
                             }
 
                             else -> {
-                                "La aplicación está actualizada."
+                                AppMessages.About.APLICACION_ACTUALIZADA
                             }
                         },
                         hasNewVersion = hasNewVersion,
@@ -149,7 +150,7 @@ class AboutViewModel @Inject constructor(
                     state.value = state.value.copy(
                         loading = false,
                         versionCheck = null,
-                        error = t.message ?: "No se pudo consultar versión",
+                        error = t.message ?: AppMessages.About.NO_SE_PUDO_CONSULTAR_VERSION,
                         info = null,
                         hasNewVersion = false,
                         isMandatoryUpdate = false,

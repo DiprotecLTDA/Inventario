@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.AppConnectionMonitor
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.ui.connection.AppConnectionMode
@@ -74,7 +75,7 @@ class MainMenuViewModel @Inject constructor(
             _pendingSyncState.value = _pendingSyncState.value.copy(
                 syncing = false,
                 canSyncPending = false,
-                message = "Sin conexión a internet. No se puede sincronizar pendientes."
+                message = AppMessages.PendingSync.SIN_CONEXION
             )
             return
         }
@@ -100,7 +101,7 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = "Sincronización de pendientes finalizada"
+                        message = AppMessages.PendingSync.FINALIZADA
                     )
                 }
 
@@ -109,7 +110,7 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = "No se pudo sincronizar pendientes"
+                        message = AppMessages.PendingSync.FALLIDA
                     )
                 }
 
@@ -118,7 +119,7 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = "Sincronización cancelada"
+                        message = AppMessages.PendingSync.CANCELADA
                     )
                 }
 
@@ -127,7 +128,7 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = "No se pudo sincronizar ahora. Se reintentará automáticamente."
+                        message = AppMessages.PendingSync.REINTENTO_AUTOMATICO
                     )
                 }
             }

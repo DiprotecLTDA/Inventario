@@ -1,6 +1,7 @@
 package com.diprotec.inventario.data.repository
 
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.dao.ProductDao
 import com.diprotec.inventario.data.local.entity.ProductEntity
@@ -20,7 +21,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun fetchRemoteProductos(): List<ProductoDto> {
         val empresaRut = settings.empresaRut.value.trim()
-        require(empresaRut.isNotBlank()) { "Empresa RUT no configurado" }
+        require(empresaRut.isNotBlank()) { AppMessages.Configuration.EMPRESA_RUT_NO_CONFIGURADO }
 
         val relativeUrl = "/api/website/v1/productos/$empresaRut/GetProductos"
         val headers = headersBuilder.build(

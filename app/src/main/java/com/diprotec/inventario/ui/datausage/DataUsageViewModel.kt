@@ -2,6 +2,7 @@ package com.diprotec.inventario.ui.datausage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.data.local.dao.NetworkUsageGroupRow
 import com.diprotec.inventario.data.repository.NetworkUsageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -62,7 +63,7 @@ class DataUsageViewModel @Inject constructor(
         viewModelScope.launch {
             repository.clearAll()
             _state.value = _state.value.copy(
-                message = "Registros limpiados"
+                message = AppMessages.DataUsage.REGISTROS_LIMPIADOS
             )
             refresh()
         }

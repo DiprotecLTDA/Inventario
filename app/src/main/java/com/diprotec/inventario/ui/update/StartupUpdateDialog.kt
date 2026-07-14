@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.ui.common.AppFloatingMessage
 import java.io.File
 import kotlinx.coroutines.delay
@@ -68,7 +69,7 @@ fun StartupUpdateDialog(
 
                 if (info == null) {
                     AppFloatingMessage.error(
-                        "No se pudo leer el estado de la descarga"
+                        AppMessages.Download.NO_SE_PUDO_LEER_ESTADO
                     )
 
                     scope.launch { vm.resetPendingUpdate() }
@@ -86,7 +87,7 @@ fun StartupUpdateDialog(
 
                 if (info.status == DownloadManager.STATUS_FAILED) {
                     AppFloatingMessage.error(
-                        "Descarga falló: ${info.reasonText}"
+                        AppMessages.Download.fallo(info.reasonText)
                     )
 
                     scope.launch { vm.resetPendingUpdate() }
@@ -107,7 +108,7 @@ fun StartupUpdateDialog(
 
                 if (uri == null) {
                     AppFloatingMessage.error(
-                        "La descarga terminó, pero no se pudo abrir el archivo"
+                        AppMessages.Download.ARCHIVO_NO_SE_PUDO_ABRIR
                     )
 
                     isDownloading = false
@@ -240,14 +241,14 @@ fun StartupUpdateDialog(
 
                     if (url.isBlank()) {
                         AppFloatingMessage.error(
-                            "No hay URL de actualización disponible"
+                            AppMessages.Download.SIN_URL_ACTUALIZACION
                         )
                         return@TextButton
                     }
 
                     if (fileName.isBlank()) {
                         AppFloatingMessage.error(
-                            "No hay nombre de archivo para la actualización"
+                            AppMessages.Download.SIN_NOMBRE_ARCHIVO
                         )
                         return@TextButton
                     }
@@ -308,7 +309,7 @@ fun StartupUpdateDialog(
 
                     onUpdateStarted()
 
-                    AppFloatingMessage.info("Descarga iniciada")
+                    AppFloatingMessage.info(AppMessages.Download.INICIADA)
 
                     Log.d(TAG, "url=$url")
                     Log.d(TAG, "fileName=$fileName")
@@ -343,7 +344,7 @@ private fun openInstaller(
         !context.packageManager.canRequestPackageInstalls()
     ) {
         AppFloatingMessage.error(
-            "Permite instalar apps desconocidas para continuar"
+            AppMessages.Download.PERMITIR_APPS_DESCONOCIDAS
         )
 
         val settingsIntent = Intent(
@@ -373,7 +374,7 @@ private fun openInstaller(
         Log.e(TAG, "No se pudo abrir el instalador", t)
 
         AppFloatingMessage.error(
-            "No se pudo abrir el instalador: ${t.message}"
+            AppMessages.Download.noSePudoAbrirInstalador(t.message)
         )
     } finally {
         onFinished()

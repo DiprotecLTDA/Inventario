@@ -11,6 +11,7 @@ import com.diprotec.inventario.core.device.GetSerialNumber
 import com.diprotec.inventario.core.key.DeviceKeyStoreManager
 import com.diprotec.inventario.core.key.DevicePublicKeyExporter
 import com.diprotec.inventario.core.key.KeyFileReader
+import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.validator.RutValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -96,7 +97,7 @@ class SettingsViewModel @Inject constructor(
 
         if (base.isBlank()) {
             _state.value = s.copy(
-                error = "Debes ingresar la Base URL.",
+                error = AppMessages.Settings.INGRESE_BASE_URL,
                 info = null,
                 saving = false
             )
@@ -105,7 +106,7 @@ class SettingsViewModel @Inject constructor(
 
         if (!(base.startsWith("http://") || base.startsWith("https://"))) {
             _state.value = s.copy(
-                error = "La Base URL debe comenzar con http:// o https://",
+                error = AppMessages.Settings.BASE_URL_PROTOCOLO,
                 info = null,
                 saving = false
             )
@@ -114,7 +115,7 @@ class SettingsViewModel @Inject constructor(
 
         if (!base.endsWith("/")) {
             _state.value = s.copy(
-                error = "La Base URL debe terminar con /",
+                error = AppMessages.Settings.BASE_URL_SLASH_FINAL,
                 info = null,
                 saving = false
             )
@@ -123,7 +124,7 @@ class SettingsViewModel @Inject constructor(
 
         if (emp.isBlank()) {
             _state.value = s.copy(
-                error = "Debes ingresar el RUT de la empresa.",
+                error = AppMessages.Settings.INGRESE_RUT_EMPRESA,
                 info = null,
                 saving = false
             )
@@ -133,7 +134,7 @@ class SettingsViewModel @Inject constructor(
         val normalizedRut = RutValidator.validateAndNormalize(emp)
         if (normalizedRut == null) {
             _state.value = s.copy(
-                error = "RUT de empresa inválido",
+                error = AppMessages.Settings.RUT_EMPRESA_INVALIDO,
                 info = null,
                 saving = false
             )
@@ -142,7 +143,7 @@ class SettingsViewModel @Inject constructor(
 
         if (!hasCredentials()) {
             _state.value = s.copy(
-                error = "Debes cargar el archivo de credenciales.",
+                error = AppMessages.Settings.CARGUE_ARCHIVO_CREDENCIALES,
                 info = null,
                 saving = false
             )
@@ -151,7 +152,7 @@ class SettingsViewModel @Inject constructor(
 
         if (!settings.deviceActivated.value && activationCode.isBlank()) {
             _state.value = s.copy(
-                error = "Debes ingresar el Activation Code.",
+                error = AppMessages.Settings.INGRESE_ACTIVATION_CODE,
                 info = null,
                 saving = false
             )
@@ -217,14 +218,14 @@ class SettingsViewModel @Inject constructor(
             }.onFailure {
                 _state.value = _state.value.copy(
                     saving = false,
-                    error = it.message ?: "Error guardando configuración",
+                    error = it.message ?: AppMessages.Settings.ERROR_GUARDANDO_CONFIGURACION,
                     info = null
                 )
             }.onSuccess {
                 _state.value = _state.value.copy(
                     saving = false,
                     error = null,
-                    info = "Configuración guardada correctamente"
+                    info = AppMessages.Settings.CONFIGURACION_GUARDADA
                 )
                 onDone()
             }
@@ -238,7 +239,7 @@ class SettingsViewModel @Inject constructor(
 
         if (raw.isNullOrBlank()) {
             _state.value = _state.value.copy(
-                error = "No pude leer el archivo seleccionado.",
+                error = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO,
                 info = null
             )
             return false
@@ -249,7 +250,7 @@ class SettingsViewModel @Inject constructor(
 
         if (tokenFromFile.isNullOrBlank() || apiKeyFromFile.isNullOrBlank()) {
             _state.value = _state.value.copy(
-                error = "El archivo no contiene authToken/apiKey en el formato esperado.",
+                error = AppMessages.Credentials.ARCHIVO_FORMATO_INESPERADO,
                 info = null
             )
             return false
@@ -258,7 +259,7 @@ class SettingsViewModel @Inject constructor(
         if (!KeyFileReader.isInventarioToken(tokenFromFile)) {
             val appClaim = KeyFileReader.extractJwtAppClaim(tokenFromFile)
             _state.value = _state.value.copy(
-                error = "El token no corresponde a Inventario. app=${appClaim ?: "desconocida"}",
+                error = AppMessages.Credentials.tokenNoCorresponde(appClaim),
                 info = null
             )
             return false
@@ -281,11 +282,11 @@ class SettingsViewModel @Inject constructor(
         _state.value = if (ok) {
             _state.value.copy(
                 error = null,
-                info = "Credenciales cargadas correctamente"
+                info = AppMessages.Credentials.CARGADAS_CORRECTAMENTE
             )
         } else {
             _state.value.copy(
-                error = "Error guardando credenciales.",
+                error = AppMessages.Credentials.ERROR_GUARDANDO,
                 info = null
             )
         }
