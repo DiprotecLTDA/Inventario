@@ -34,8 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.diprotec.inventario.ui.theme.BrandPrimary
-import com.diprotec.inventario.ui.theme.Error
-import com.diprotec.inventario.ui.theme.Success
+import com.diprotec.inventario.ui.theme.StatusError
+import com.diprotec.inventario.ui.theme.StatusOnline
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -139,8 +139,8 @@ private fun FloatingMessageContent(
     val backgroundColor: Color =
         when (message.type) {
             FloatingMessageType.INFO -> BrandPrimary
-            FloatingMessageType.SUCCESS -> Success
-            FloatingMessageType.ERROR -> Error
+            FloatingMessageType.SUCCESS -> StatusOnline
+            FloatingMessageType.ERROR -> StatusError
         }
 
     val icon =

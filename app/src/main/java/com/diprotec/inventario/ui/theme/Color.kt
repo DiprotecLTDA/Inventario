@@ -16,7 +16,8 @@ val LabelGray = Color(0xFF9AA0A6)
 val TextPrimary = Color(0xFF1F2937)
 
 val StatusOnline = Color(0xFF2E7D32)
-val StatusChecking = Color(0xFFF9A825)
-val StatusOffline = Color(0xFFC62828)
-val Success = Color(0xFF2E7D32)
-val Error = Color(0xFFD32F2F)
+val StatusWarning = Color(0xFFF9A825)
+val StatusError = Color(0xFFC62828)
+
+val SuccessBg = Color(0xFFEFFFFC)
+val SuccessBorder = Color(0xFFBDEBE5)

@@ -95,7 +95,7 @@ fun LoginDesignScreen(
                     if (state.needsPickKeyFile) {
                         Text(
                             text = "Seleccione el archivo 'inventario.key' para cargar credenciales.",
-                            color = Error,
+                            color = StatusError,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -136,7 +136,7 @@ fun LoginDesignScreen(
                             {
                                 Text(
                                     text = "Ej.: 19120735-1",
-                                    color = Error
+                                    color = StatusError
                                 )
                             }
                         } else {
@@ -252,7 +252,7 @@ fun LoginDesignScreen(
                     state.error?.let {
                         Text(
                             text = it,
-                            color = Error,
+                            color = StatusError,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -261,7 +261,7 @@ fun LoginDesignScreen(
                     state.info?.let {
                         Text(
                             text = it,
-                            color = Success,
+                            color = StatusOnline,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.fillMaxWidth()
                         )

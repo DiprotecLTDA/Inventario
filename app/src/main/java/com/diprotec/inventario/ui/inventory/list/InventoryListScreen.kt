@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.data.local.entity.InventoryItemEntity
 import com.diprotec.inventario.ui.theme.Background
-import com.diprotec.inventario.ui.theme.Error
+import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.InventoryTopBar
 import com.diprotec.inventario.ui.theme.OutlinedInfoCard
 import com.diprotec.inventario.ui.theme.SegmentedToggle
@@ -125,7 +125,7 @@ fun InventoryListScreen(
                 Text(
                     text = uiState.errorMessage.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Error,
+                    color = StatusError,
                     modifier = Modifier.testTag("inventory_error_message")
                 )
             }

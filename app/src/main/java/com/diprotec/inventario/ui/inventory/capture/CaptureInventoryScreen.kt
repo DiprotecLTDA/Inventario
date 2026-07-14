@@ -69,7 +69,7 @@ import com.diprotec.inventario.ui.theme.AppPrimaryButton
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BrandPrimary
 import com.diprotec.inventario.ui.theme.BrandPrimaryDark
-import com.diprotec.inventario.ui.theme.Error
+import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
 import com.diprotec.inventario.ui.theme.TextPrimary
@@ -559,7 +559,7 @@ fun CaptureInventoryScreen(
 
                 Text(
                     text = uiState.errorMessage.orEmpty(),
-                    color = Error,
+                    color = StatusError,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth()
                 )

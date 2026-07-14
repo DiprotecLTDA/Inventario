@@ -7,10 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.diprotec.inventario.ui.theme.StatusChecking
 import com.diprotec.inventario.ui.theme.StatusChip
-import com.diprotec.inventario.ui.theme.StatusOffline
+import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.StatusOnline
+import com.diprotec.inventario.ui.theme.StatusWarning
 
 @Composable
 fun WorkerTrafficLight(
@@ -21,8 +21,8 @@ fun WorkerTrafficLight(
 
     val color = when (state) {
         WorkerSyncState.SYNCING -> StatusOnline
-        WorkerSyncState.WAITING -> StatusChecking
-        WorkerSyncState.STOPPED -> StatusOffline
+        WorkerSyncState.WAITING -> StatusWarning
+        WorkerSyncState.STOPPED -> StatusError
     }
 
     val shortValue = when (state) {

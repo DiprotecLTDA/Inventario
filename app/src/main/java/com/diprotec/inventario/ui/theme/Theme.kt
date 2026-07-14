@@ -16,7 +16,7 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary = TextPrimary,
     onBackground = TextPrimary,
     onSurface = TextPrimary,
-    error = Error
+    error = StatusError
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -30,7 +30,7 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = TextPrimary,
     onBackground = TextPrimary,
     onSurface = TextPrimary,
-    error = Error
+    error = StatusError
 )
 
 @Composable
@@ -47,6 +47,7 @@ fun InventarioTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = AppShapes,
         content = content
     )
 }

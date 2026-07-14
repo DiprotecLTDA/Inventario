@@ -44,7 +44,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -56,12 +55,11 @@ import com.diprotec.inventario.ui.theme.AppPrimaryButton
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.InventoryTopBar
 import com.diprotec.inventario.ui.theme.LabelGray
+import com.diprotec.inventario.ui.theme.SuccessBg
+import com.diprotec.inventario.ui.theme.SuccessBorder
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.inventoryTextFieldColors
 import kotlinx.coroutines.launch
-
-private val SuccessBg = Color(0xFFEFFFFC)
-private val SuccessBorder = Color(0xFFBDEBE5)
 
 @Composable
 fun SettingsScreen(

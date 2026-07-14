@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BorderGray
-import com.diprotec.inventario.ui.theme.Error
+import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.InventoryTopBar
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
@@ -132,7 +132,7 @@ fun CreateInventoryScreen(
                 if (!uiState.errorMessage.isNullOrBlank()) {
                     Text(
                         text = uiState.errorMessage.orEmpty(),
-                        color = Error,
+                        color = StatusError,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth()
                     )
