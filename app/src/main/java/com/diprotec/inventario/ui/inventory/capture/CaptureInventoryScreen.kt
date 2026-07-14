@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -71,6 +70,7 @@ import com.diprotec.inventario.ui.components.inventoryTextFieldColors
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BrandPrimary
 import com.diprotec.inventario.ui.theme.BrandPrimaryDark
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
@@ -82,10 +82,10 @@ private const val TAG_SCAN_CAPTURE = "SCAN_CAPTURE"
 private const val PRODUCT_REGISTERED_MESSAGE_MS = 800L
 private const val MAX_BARCODE_LENGTH = 50
 
-private val FieldSpacing = 8.dp
-private val LabelSpacing = 6.dp
+private val FieldSpacing = Dimens.spaceS
+private val LabelSpacing = Dimens.spaceXs
 private val LabelTopPadding = 10.dp
-private val BottomContentPadding = 12.dp
+private val BottomContentPadding = Dimens.spaceM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -311,7 +311,7 @@ fun CaptureInventoryScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .padding(horizontal = Dimens.spaceXl, vertical = Dimens.spaceM)
                 .testTag("capture_screen"),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -351,9 +351,9 @@ fun CaptureInventoryScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 56.dp)
+                            .heightIn(min = Dimens.fieldMinHeight)
                             .testTag("input_ubicacion"),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = MaterialTheme.shapes.medium,
                         colors = inventoryTextFieldColors()
                     )
                 }
@@ -424,7 +424,7 @@ fun CaptureInventoryScreen(
                         focusQuantityField()
                     }
                 ),
-                minHeight = 56.dp,
+                minHeight = Dimens.fieldMinHeight,
                 readOnly = false,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -503,7 +503,7 @@ fun CaptureInventoryScreen(
                             .weight(1f)
                             .testTag("input_quantity")
                             .focusRequester(quantityFocusRequester),
-                        minHeight = 56.dp
+                        minHeight = Dimens.fieldMinHeight
                     )
 
                     UnitDropdownField(
@@ -548,7 +548,7 @@ fun CaptureInventoryScreen(
                 onValueChange = {},
                 label = "Descripción",
                 keyboardType = KeyboardType.Text,
-                minHeight = 56.dp,
+                minHeight = Dimens.fieldMinHeight,
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -649,7 +649,7 @@ private fun UnitDropdownField(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 56.dp)
+                    .heightIn(min = Dimens.fieldMinHeight)
                     .then(
                         if (focusRequester != null) {
                             Modifier.focusRequester(focusRequester)
@@ -657,7 +657,7 @@ private fun UnitDropdownField(
                             Modifier
                         }
                     ),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = inventoryTextFieldColors()
             )
         }
@@ -702,7 +702,7 @@ private fun SlideCaptureSelector(
             .fillMaxWidth()
             .height(48.dp)
             .testTag("selector_capture_mode")
-            .clip(RoundedCornerShape(24.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(White)
     ) {
         Row(
@@ -713,7 +713,7 @@ private fun SlideCaptureSelector(
                     .weight(1f)
                     .fillMaxSize()
                     .testTag("capture_mode_unit")
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(MaterialTheme.shapes.large)
                     .background(
                         if (selectedMode == CaptureMode.UNIT) {
                             Brush.horizontalGradient(listOf(BrandPrimary, BrandPrimaryDark))
@@ -737,7 +737,7 @@ private fun SlideCaptureSelector(
                     .weight(1f)
                     .fillMaxSize()
                     .testTag("capture_mode_quantity")
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(MaterialTheme.shapes.large)
                     .background(
                         if (selectedMode == CaptureMode.QUANTITY) {
                             Brush.horizontalGradient(listOf(BrandPrimary, BrandPrimaryDark))
@@ -819,7 +819,7 @@ private fun BarcodeInventoryTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = minHeight),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = inventoryTextFieldColors()
         )
     }
@@ -856,7 +856,7 @@ private fun InventoryTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = minHeight),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = inventoryTextFieldColors()
         )
     }
@@ -885,7 +885,7 @@ private fun FloatingLabelContainer(
             style = MaterialTheme.typography.bodySmall,
             maxLines = 1,
             modifier = Modifier
-                .padding(start = 16.dp)
+                .padding(start = Dimens.spaceL)
                 .background(Background)
                 .padding(horizontal = 7.dp)
                 .zIndex(1f)
