@@ -16,8 +16,6 @@ import com.diprotec.inventario.core.network.NetworkUsageContext
 import com.diprotec.inventario.service.SyncService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import retrofit2.HttpException
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -30,7 +28,13 @@ class StartupSyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork id=$id attempt=$runAttemptCount")
 
-        return try {
+        return runSyncWork(
+            tag = TAG,
+            onUnexpected = { t ->
+                Log.e(TAG, "Unexpected error -> failure", t)
+                Result.failure()
+            }
+        ) {
             val versionResult = NetworkUsageContext.runWith(
                 source = NetworkUsageClassifier.SOURCE_WORKER,
                 operation = "Worker chequeo actualización inicial"
@@ -52,26 +56,6 @@ class StartupSyncWorker @AssistedInject constructor(
                         "mandatory=${versionResult.mandatory}, " +
                         "users=$users"
             )
-
-            Result.success()
-        } catch (e: IOException) {
-            Log.w(TAG, "Network error -> retry", e)
-            Result.retry()
-        } catch (e: HttpException) {
-            Log.w(
-                TAG,
-                "HTTP ${e.code()} -> ${if (e.code() >= 500) "retry" else "failure"}",
-                e
-            )
-
-            if (e.code() >= 500) {
-                Result.retry()
-            } else {
-                Result.failure()
-            }
-        } catch (t: Throwable) {
-            Log.e(TAG, "Unexpected error -> failure", t)
-            Result.failure()
         }
     }
 

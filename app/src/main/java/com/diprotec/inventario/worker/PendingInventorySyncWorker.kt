@@ -18,10 +18,8 @@ import com.diprotec.inventario.core.network.NetworkUsageContext
 import com.diprotec.inventario.service.SyncService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import retrofit2.HttpException
 
 @HiltWorker
 class PendingInventorySyncWorker @AssistedInject constructor(
@@ -33,7 +31,13 @@ class PendingInventorySyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork id=$id attempt=$runAttemptCount")
 
-        return try {
+        return runSyncWork(
+            tag = TAG,
+            onUnexpected = { t ->
+                Log.e(TAG, "Unexpected error -> retry", t)
+                Result.retry()
+            }
+        ) {
             val summary = NetworkUsageContext.runWith(
                 source = NetworkUsageClassifier.SOURCE_WORKER,
                 operation = "Worker sincronizar inventarios pendientes"
@@ -45,26 +49,6 @@ class PendingInventorySyncWorker @AssistedInject constructor(
                 TAG,
                 "Pending inventory sync OK. Capturas=${summary.capturas}, Finalizados=${summary.finalizados}"
             )
-
-            Result.success()
-        } catch (e: IOException) {
-            Log.w(TAG, "Network error -> retry", e)
-            Result.retry()
-        } catch (e: HttpException) {
-            Log.w(
-                TAG,
-                "HTTP ${e.code()} -> ${if (e.code() >= 500) "retry" else "failure"}",
-                e
-            )
-
-            if (e.code() >= 500) {
-                Result.retry()
-            } else {
-                Result.failure()
-            }
-        } catch (t: Throwable) {
-            Log.e(TAG, "Unexpected error -> retry", t)
-            Result.retry()
         }
     }
 
