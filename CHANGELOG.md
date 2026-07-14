@@ -14,11 +14,24 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   `InventoryTopBar`, `StatusChip`, `SegmentedToggle`, `OutlinedInfoCard`,
   `AppPrimaryButton` e `inventoryTextFieldColors()`.
 - Tokens de color semánticos en `ui/theme/Color.kt`
-  (`BrandPrimary`, `BrandPrimaryDark`, `BrandAccent`, `BrandSurfaceTint`,
-  `StatusOnline`, `StatusChecking`, `StatusOffline`, `Success`, `Error`).
+  (`BrandPrimary`, `BrandPrimaryDark`, `BrandAccent`, `BrandSurfaceTint`) y de estado
+  canónicos (`StatusOnline` #2E7D32, `StatusWarning` #F9A825, `StatusError` #C62828).
 - Migración de base de datos `26 → 27` (no-op documentado) para completar la
   ruta continua `25 → 26 → 27 → 28`.
 - `README.md` y `CHANGELOG.md`.
+
+#### Alineación con los estándares de la app Zebra TC27
+- **`core/message/AppMessages.kt`**: fuente única de mensajes de usuario, agrupados por
+  área; los mensajes con interpolación se exponen como funciones de formato idéntico.
+- **Contratos de red** (`core/network/`): `BaseApiResponse` (envelope `Estado`/`Respuesta`/
+  `Data`/`CodigoError`/`CorrelationId`), `ApiException` (con `httpCode`, `estado`,
+  `codigoError`, `correlationId` y `cause`) y `ApiCallExecutor` (`@Singleton`), único punto
+  de ejecución y parseo de errores de la API.
+- **Escala tipográfica completa** en `ui/theme/Type.kt`: una sola `FontFamily` y los estilos
+  que faltaban (`titleSmall`, `bodySmall`, `headlineMedium`).
+- **`ui/theme/Shape.kt`** (`AppShapes`, radios 10/16/24 dp) y **`ui/theme/Dimens.kt`**
+  (escala de espaciado, alturas, iconos, bordes y elevaciones).
+- Duración opcional por evento en los mensajes flotantes (`FloatingMessageEvent.durationMillis`).
 
 ### Cambiado
 - **Unificación de diseño**: botones, campos de texto, top-bars, tarjetas, chips de
@@ -45,6 +58,22 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
 - **Estandarización de nombres de archivo** para coincidir con su clase:
   `DynamicBaseUrlinterceptor.kt` → `DynamicBaseUrlInterceptor.kt` y
   `UserRepositoryimpl.kt` → `UserRepositoryImpl.kt`.
+- **Mensajes de usuario centralizados**: los literales de flotantes, de estado de UI
+  (`errorMessage`/`successMessage`) y las validaciones de configuración repetidas de
+  repositorios y `SyncService` pasan a referenciar `AppMessages`. Textos sin reformular.
+- **Migración de toda la red JSON al `ApiCallExecutor`**: los 11 DTOs de respuesta implementan
+  `BaseApiResponse`; las 11 firmas de `ApiService` devuelven `Response<T>`; los 6 repositorios
+  y los servicios `SyncService`/`ActivateDeviceService`/`VersionService` ejecutan sus llamadas
+  vía `apiCallExecutor.execute { ... }`. Se eliminó el manejo manual de `isSuccessful`/
+  `errorBody`/`body` y el criterio de éxito quedó unificado (`Estado` 0 o 200).
+  Los DTOs de *request* no se tocaron: su JSON de salida es idéntico.
+- Homogeneizados a `@Json` + camelCase los DTOs de respuesta de login, activación, envío de
+  capturas y finalización (antes usaban PascalCase crudo).
+- `SyncWorkRunner` mapea `ApiException` preservando la semántica previa de reintentos:
+  HTTP ≥ 500 → retry, 4xx → failure, `cause` de red → retry, resto → comportamiento propio de
+  cada worker.
+- `Theme.kt` cablea `shapes = AppShapes` junto a `colorScheme` y `typography`.
+- Barra de estado, degradados y colores de estado alineados a los tokens canónicos.
 
 ### Corregido
 - **Riesgo de pérdida de datos**: hueco de migración `26 → 27` que, con el fallback
@@ -58,6 +87,18 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   (`@Transaction`) en vez de `clearAll()` + `upsertAll()` sueltos, evitando dejar la tabla de
   usuarios vacía si el proceso se interrumpe entre ambas llamadas. Consistente con el resto de
   los repositorios de catálogo.
+- **Mensajes flotantes duplicados**: el host estaba montado dos veces (en `NavGraph` y en
+  `CaptureInventoryScreen`), por lo que en la pantalla de captura cada mensaje se renderizaba
+  dos veces. Ahora hay un host único en el `Box` raíz del `NavGraph`; la captura conserva sus
+  800 ms mediante la duración por evento (el resto usa los 2000 ms globales).
+- **Jerga técnica expuesta al usuario**: los errores de API mostraban cadenas del tipo
+  `"… falló. Estado=…, CodigoError=…"`. Ahora se muestra el campo `Respuesta` del servidor y,
+  si no viene, un mensaje seguro según el código HTTP; el detalle técnico queda en `Log`.
+  Tampoco se expone texto de Retrofit/Moshi/Java: `UnknownHostException`, `SocketTimeoutException`
+  e `IOException` se traducen a mensajes en español. `CancellationException` se relanza sin
+  envolver, preservando la cancelación estructurada de corrutinas.
+- **Tipografía inconsistente**: `bodySmall` y `titleSmall` se usaban sin estar definidos y caían
+  al default de Material (otra familia y tamaño). Ahora están declarados en la escala.
 
 ### Eliminado
 - Código muerto verificado (0 usos): clúster `Barcode*`
