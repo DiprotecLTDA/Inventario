@@ -130,75 +130,57 @@ class SyncService @Inject constructor(
         }
     }
 
-    suspend fun syncUsers(): Int = withContext(Dispatchers.IO) {
+    private suspend fun <D, E> syncCatalog(
+        label: String,
+        fetch: suspend () -> List<D>,
+        map: (D) -> E,
+        replace: suspend (List<E>) -> Unit
+    ): Int = withContext(Dispatchers.IO) {
         requireConfigured()
         requireActivated()
         ensureDeviceSession()
 
-        val remote = userRepository.fetchRemoteUsers()
-        val mapped = remote.map { it.toEntity() }
+        val mapped = fetch().map(map)
+        replace(mapped)
 
-        userRepository.replaceAllUsers(mapped)
-
-        Log.d(TAG, "Usuarios sincronizados: ${mapped.size}")
+        Log.d(TAG, "$label: ${mapped.size}")
         mapped.size
     }
 
-    suspend fun syncReglas(): Int = withContext(Dispatchers.IO) {
-        requireConfigured()
-        requireActivated()
-        ensureDeviceSession()
+    suspend fun syncUsers(): Int = syncCatalog(
+        label = "Usuarios sincronizados",
+        fetch = userRepository::fetchRemoteUsers,
+        map = { it.toEntity() },
+        replace = userRepository::replaceAllUsers
+    )
 
-        val remote = ruleRepository.fetchRemoteReglas()
-        val mapped = remote.map { it.toEntity() }
+    suspend fun syncReglas(): Int = syncCatalog(
+        label = "Reglas sincronizadas",
+        fetch = ruleRepository::fetchRemoteReglas,
+        map = { it.toEntity() },
+        replace = ruleRepository::replaceAllReglas
+    )
 
-        ruleRepository.replaceAllReglas(mapped)
+    suspend fun syncUbicaciones(): Int = syncCatalog(
+        label = "Ubicaciones sincronizadas",
+        fetch = locationRepository::fetchRemoteUbicaciones,
+        map = { it.toEntity() },
+        replace = locationRepository::replaceAllUbicaciones
+    )
 
-        Log.d(TAG, "Reglas sincronizadas: ${mapped.size}")
-        mapped.size
-    }
+    suspend fun syncProductos(): Int = syncCatalog(
+        label = "Productos sincronizados",
+        fetch = productRepository::fetchRemoteProductos,
+        map = { it.toEntity() },
+        replace = productRepository::replaceAllProductos
+    )
 
-    suspend fun syncUbicaciones(): Int = withContext(Dispatchers.IO) {
-        requireConfigured()
-        requireActivated()
-        ensureDeviceSession()
-
-        val remote = locationRepository.fetchRemoteUbicaciones()
-        val mapped = remote.map { it.toEntity() }
-
-        locationRepository.replaceAllUbicaciones(mapped)
-
-        Log.d(TAG, "Ubicaciones sincronizadas: ${mapped.size}")
-        mapped.size
-    }
-
-    suspend fun syncProductos(): Int = withContext(Dispatchers.IO) {
-        requireConfigured()
-        requireActivated()
-        ensureDeviceSession()
-
-        val remote = productRepository.fetchRemoteProductos()
-        val mapped = remote.map { it.toEntity() }
-
-        productRepository.replaceAllProductos(mapped)
-
-        Log.d(TAG, "Productos sincronizados: ${mapped.size}")
-        mapped.size
-    }
-
-    suspend fun syncUnidadMedidas(): Int = withContext(Dispatchers.IO) {
-        requireConfigured()
-        requireActivated()
-        ensureDeviceSession()
-
-        val remote = unitMeasureRepository.fetchRemoteUnidadMedidas()
-        val mapped = remote.map { it.toEntity() }
-
-        unitMeasureRepository.replaceAllUnidadMedidas(mapped)
-
-        Log.d(TAG, "UnidadMedidas sincronizadas: ${mapped.size}")
-        mapped.size
-    }
+    suspend fun syncUnidadMedidas(): Int = syncCatalog(
+        label = "UnidadMedidas sincronizadas",
+        fetch = unitMeasureRepository::fetchRemoteUnidadMedidas,
+        map = { it.toEntity() },
+        replace = unitMeasureRepository::replaceAllUnidadMedidas
+    )
 
     suspend fun syncInventariosRemotos(): Int = withContext(Dispatchers.IO) {
         requireConfigured()
