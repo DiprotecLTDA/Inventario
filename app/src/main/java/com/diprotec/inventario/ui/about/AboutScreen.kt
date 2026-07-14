@@ -84,17 +84,17 @@ fun AboutScreen(
         vm.loadRemoteVersion()
     }
 
-    LaunchedEffect(s.info) {
-        s.info?.let {
+    LaunchedEffect(s.successMessage) {
+        s.successMessage?.let {
             AppFloatingMessage.info(it)
-            vm.clearInfo()
+            vm.clearMessages()
         }
     }
 
-    LaunchedEffect(s.error) {
-        s.error?.let {
+    LaunchedEffect(s.errorMessage) {
+        s.errorMessage?.let {
             AppFloatingMessage.error(it)
-            vm.clearError()
+            vm.clearMessages()
         }
     }
 

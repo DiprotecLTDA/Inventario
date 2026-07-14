@@ -22,7 +22,7 @@ data class DataUsageUiState(
     val byOperation: List<NetworkUsageGroupRow> = emptyList(),
     val bySource: List<NetworkUsageGroupRow> = emptyList(),
     val byEndpoint: List<NetworkUsageGroupRow> = emptyList(),
-    val message: String? = null
+    val successMessage: String? = null
 )
 
 @HiltViewModel
@@ -41,7 +41,7 @@ class DataUsageViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value.copy(
                 loading = true,
-                message = null
+                successMessage = null
             )
 
             val summary = repository.loadSummary()
@@ -63,7 +63,7 @@ class DataUsageViewModel @Inject constructor(
         viewModelScope.launch {
             repository.clearAll()
             _state.value = _state.value.copy(
-                message = AppMessages.DataUsage.REGISTROS_LIMPIADOS
+                successMessage = AppMessages.DataUsage.REGISTROS_LIMPIADOS
             )
             refresh()
         }
@@ -86,7 +86,7 @@ class DataUsageViewModel @Inject constructor(
         return String.format(Locale.US, "%.2f GB", gb)
     }
 
-    fun clearMessage() {
-        _state.value = _state.value.copy(message = null)
+    fun clearMessages() {
+        _state.value = _state.value.copy(successMessage = null)
     }
 }

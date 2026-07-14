@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 
 data class PendingSyncUiState(
     val syncing: Boolean = false,
-    val message: String? = null,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
     val connectionMode: AppConnectionMode = AppConnectionMode.CHECKING,
     val canSyncPending: Boolean = false
 )
@@ -75,7 +76,8 @@ class MainMenuViewModel @Inject constructor(
             _pendingSyncState.value = _pendingSyncState.value.copy(
                 syncing = false,
                 canSyncPending = false,
-                message = AppMessages.PendingSync.SIN_CONEXION
+                errorMessage = AppMessages.PendingSync.SIN_CONEXION,
+                successMessage = null
             )
             return
         }
@@ -85,7 +87,8 @@ class MainMenuViewModel @Inject constructor(
         _pendingSyncState.value = _pendingSyncState.value.copy(
             syncing = true,
             canSyncPending = false,
-            message = null
+            errorMessage = null,
+            successMessage = null
         )
 
         val workId = PendingInventorySyncWorker.runOnce(context)
@@ -101,7 +104,8 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = AppMessages.PendingSync.FINALIZADA
+                        errorMessage = null,
+                        successMessage = AppMessages.PendingSync.FINALIZADA
                     )
                 }
 
@@ -110,7 +114,8 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = AppMessages.PendingSync.FALLIDA
+                        errorMessage = AppMessages.PendingSync.FALLIDA,
+                        successMessage = null
                     )
                 }
 
@@ -119,7 +124,8 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = AppMessages.PendingSync.CANCELADA
+                        errorMessage = AppMessages.PendingSync.CANCELADA,
+                        successMessage = null
                     )
                 }
 
@@ -128,7 +134,8 @@ class MainMenuViewModel @Inject constructor(
                     _pendingSyncState.value = _pendingSyncState.value.copy(
                         syncing = false,
                         canSyncPending = _pendingSyncState.value.connectionMode == AppConnectionMode.ONLINE_API,
-                        message = AppMessages.PendingSync.REINTENTO_AUTOMATICO
+                        errorMessage = AppMessages.PendingSync.REINTENTO_AUTOMATICO,
+                        successMessage = null
                     )
                 }
             }
@@ -139,9 +146,10 @@ class MainMenuViewModel @Inject constructor(
         liveData.observeForever(observer)
     }
 
-    fun clearPendingSyncMessage() {
+    fun clearMessages() {
         _pendingSyncState.value = _pendingSyncState.value.copy(
-            message = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 

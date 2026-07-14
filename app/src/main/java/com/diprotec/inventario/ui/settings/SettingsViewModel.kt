@@ -25,8 +25,8 @@ data class SettingsUiState(
     val empresaRut: String = "",
     val activationCode: String = "",
     val saving: Boolean = false,
-    val error: String? = null,
-    val info: String? = null
+    val errorMessage: String? = null,
+    val successMessage: String? = null
 )
 
 @HiltViewModel
@@ -48,12 +48,11 @@ class SettingsViewModel @Inject constructor(
 
     val state: State<SettingsUiState> = _state
 
-    fun clearError() {
-        _state.value = _state.value.copy(error = null)
-    }
-
-    fun clearInfo() {
-        _state.value = _state.value.copy(info = null)
+    fun clearMessages() {
+        _state.value = _state.value.copy(
+            errorMessage = null,
+            successMessage = null
+        )
     }
 
     fun hasCredentials(): Boolean {
@@ -68,24 +67,24 @@ class SettingsViewModel @Inject constructor(
     fun onBaseUrlChange(v: String) {
         _state.value = _state.value.copy(
             baseUrl = v,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
     fun onEmpresaChange(v: String) {
         _state.value = _state.value.copy(
             empresaRut = v,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
     fun onActivationCodeChange(v: String) {
         _state.value = _state.value.copy(
             activationCode = v,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
@@ -97,8 +96,8 @@ class SettingsViewModel @Inject constructor(
 
         if (base.isBlank()) {
             _state.value = s.copy(
-                error = AppMessages.Settings.INGRESE_BASE_URL,
-                info = null,
+                errorMessage = AppMessages.Settings.INGRESE_BASE_URL,
+                successMessage = null,
                 saving = false
             )
             return
@@ -106,8 +105,8 @@ class SettingsViewModel @Inject constructor(
 
         if (!(base.startsWith("http://") || base.startsWith("https://"))) {
             _state.value = s.copy(
-                error = AppMessages.Settings.BASE_URL_PROTOCOLO,
-                info = null,
+                errorMessage = AppMessages.Settings.BASE_URL_PROTOCOLO,
+                successMessage = null,
                 saving = false
             )
             return
@@ -115,8 +114,8 @@ class SettingsViewModel @Inject constructor(
 
         if (!base.endsWith("/")) {
             _state.value = s.copy(
-                error = AppMessages.Settings.BASE_URL_SLASH_FINAL,
-                info = null,
+                errorMessage = AppMessages.Settings.BASE_URL_SLASH_FINAL,
+                successMessage = null,
                 saving = false
             )
             return
@@ -124,8 +123,8 @@ class SettingsViewModel @Inject constructor(
 
         if (emp.isBlank()) {
             _state.value = s.copy(
-                error = AppMessages.Settings.INGRESE_RUT_EMPRESA,
-                info = null,
+                errorMessage = AppMessages.Settings.INGRESE_RUT_EMPRESA,
+                successMessage = null,
                 saving = false
             )
             return
@@ -134,8 +133,8 @@ class SettingsViewModel @Inject constructor(
         val normalizedRut = RutValidator.validateAndNormalize(emp)
         if (normalizedRut == null) {
             _state.value = s.copy(
-                error = AppMessages.Settings.RUT_EMPRESA_INVALIDO,
-                info = null,
+                errorMessage = AppMessages.Settings.RUT_EMPRESA_INVALIDO,
+                successMessage = null,
                 saving = false
             )
             return
@@ -143,8 +142,8 @@ class SettingsViewModel @Inject constructor(
 
         if (!hasCredentials()) {
             _state.value = s.copy(
-                error = AppMessages.Settings.CARGUE_ARCHIVO_CREDENCIALES,
-                info = null,
+                errorMessage = AppMessages.Settings.CARGUE_ARCHIVO_CREDENCIALES,
+                successMessage = null,
                 saving = false
             )
             return
@@ -152,8 +151,8 @@ class SettingsViewModel @Inject constructor(
 
         if (!settings.deviceActivated.value && activationCode.isBlank()) {
             _state.value = s.copy(
-                error = AppMessages.Settings.INGRESE_ACTIVATION_CODE,
-                info = null,
+                errorMessage = AppMessages.Settings.INGRESE_ACTIVATION_CODE,
+                successMessage = null,
                 saving = false
             )
             return
@@ -162,8 +161,8 @@ class SettingsViewModel @Inject constructor(
         _state.value = s.copy(
             empresaRut = normalizedRut,
             saving = true,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
 
         viewModelScope.launch {
@@ -218,14 +217,14 @@ class SettingsViewModel @Inject constructor(
             }.onFailure {
                 _state.value = _state.value.copy(
                     saving = false,
-                    error = it.message ?: AppMessages.Settings.ERROR_GUARDANDO_CONFIGURACION,
-                    info = null
+                    errorMessage = it.message ?: AppMessages.Settings.ERROR_GUARDANDO_CONFIGURACION,
+                    successMessage = null
                 )
             }.onSuccess {
                 _state.value = _state.value.copy(
                     saving = false,
-                    error = null,
-                    info = AppMessages.Settings.CONFIGURACION_GUARDADA
+                    errorMessage = null,
+                    successMessage = AppMessages.Settings.CONFIGURACION_GUARDADA
                 )
                 onDone()
             }
@@ -239,8 +238,8 @@ class SettingsViewModel @Inject constructor(
 
         if (raw.isNullOrBlank()) {
             _state.value = _state.value.copy(
-                error = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO,
-                info = null
+                errorMessage = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO,
+                successMessage = null
             )
             return false
         }
@@ -250,8 +249,8 @@ class SettingsViewModel @Inject constructor(
 
         if (tokenFromFile.isNullOrBlank() || apiKeyFromFile.isNullOrBlank()) {
             _state.value = _state.value.copy(
-                error = AppMessages.Credentials.ARCHIVO_FORMATO_INESPERADO,
-                info = null
+                errorMessage = AppMessages.Credentials.ARCHIVO_FORMATO_INESPERADO,
+                successMessage = null
             )
             return false
         }
@@ -259,8 +258,8 @@ class SettingsViewModel @Inject constructor(
         if (!KeyFileReader.isInventarioToken(tokenFromFile)) {
             val appClaim = KeyFileReader.extractJwtAppClaim(tokenFromFile)
             _state.value = _state.value.copy(
-                error = AppMessages.Credentials.tokenNoCorresponde(appClaim),
-                info = null
+                errorMessage = AppMessages.Credentials.tokenNoCorresponde(appClaim),
+                successMessage = null
             )
             return false
         }
@@ -281,13 +280,13 @@ class SettingsViewModel @Inject constructor(
 
         _state.value = if (ok) {
             _state.value.copy(
-                error = null,
-                info = AppMessages.Credentials.CARGADAS_CORRECTAMENTE
+                errorMessage = null,
+                successMessage = AppMessages.Credentials.CARGADAS_CORRECTAMENTE
             )
         } else {
             _state.value.copy(
-                error = AppMessages.Credentials.ERROR_GUARDANDO,
-                info = null
+                errorMessage = AppMessages.Credentials.ERROR_GUARDANDO,
+                successMessage = null
             )
         }
 

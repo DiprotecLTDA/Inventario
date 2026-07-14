@@ -87,10 +87,13 @@ fun MainMenuScreen(
         showLogoutDialog = true
     }
 
-    LaunchedEffect(pendingSyncState.message) {
-        pendingSyncState.message?.let {
+    val pendingSyncMessage =
+        pendingSyncState.successMessage ?: pendingSyncState.errorMessage
+
+    LaunchedEffect(pendingSyncMessage) {
+        pendingSyncMessage?.let {
             AppFloatingMessage.info(it)
-            viewModel.clearPendingSyncMessage()
+            viewModel.clearMessages()
         }
     }
 

@@ -45,10 +45,10 @@ fun DataUsageScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(state.message) {
-        state.message?.let {
+    LaunchedEffect(state.successMessage) {
+        state.successMessage?.let {
             AppFloatingMessage.info(it)
-            viewModel.clearMessage()
+            viewModel.clearMessages()
         }
     }
 

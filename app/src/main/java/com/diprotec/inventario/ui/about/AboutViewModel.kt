@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 data class AboutUiState(
     val loading: Boolean = false,
     val versionCheck: VersionCheckDataDto? = null,
-    val error: String? = null,
-    val info: String? = null,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
     val hasNewVersion: Boolean = false,
     val isMandatoryUpdate: Boolean = false,
     val canOperate: Boolean = true,
@@ -64,8 +64,8 @@ class AboutViewModel @Inject constructor(
 
         state.value = state.value.copy(
             loading = true,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
 
         viewModelScope.launch {
@@ -77,8 +77,8 @@ class AboutViewModel @Inject constructor(
                     connectionMode = mode,
                     canCheckUpdates = false,
                     versionCheck = null,
-                    error = AppMessages.About.SIN_CONEXION_CONSULTAR_VERSION,
-                    info = null,
+                    errorMessage = AppMessages.About.SIN_CONEXION_CONSULTAR_VERSION,
+                    successMessage = null,
                     hasNewVersion = false,
                     isMandatoryUpdate = false,
                     canOperate = true
@@ -125,8 +125,8 @@ class AboutViewModel @Inject constructor(
                     state.value = state.value.copy(
                         loading = false,
                         versionCheck = data,
-                        error = null,
-                        info = when {
+                        errorMessage = null,
+                        successMessage = when {
                             hasNewVersion && isMandatoryUpdate -> {
                                 AppMessages.About.ACTUALIZACION_OBLIGATORIA_ENCONTRADA
                             }
@@ -150,8 +150,8 @@ class AboutViewModel @Inject constructor(
                     state.value = state.value.copy(
                         loading = false,
                         versionCheck = null,
-                        error = t.message ?: AppMessages.About.NO_SE_PUDO_CONSULTAR_VERSION,
-                        info = null,
+                        errorMessage = t.message ?: AppMessages.About.NO_SE_PUDO_CONSULTAR_VERSION,
+                        successMessage = null,
                         hasNewVersion = false,
                         isMandatoryUpdate = false,
                         canOperate = true
@@ -160,11 +160,10 @@ class AboutViewModel @Inject constructor(
         }
     }
 
-    fun clearInfo() {
-        state.value = state.value.copy(info = null)
-    }
-
-    fun clearError() {
-        state.value = state.value.copy(error = null)
+    fun clearMessages() {
+        state.value = state.value.copy(
+            errorMessage = null,
+            successMessage = null
+        )
     }
 }

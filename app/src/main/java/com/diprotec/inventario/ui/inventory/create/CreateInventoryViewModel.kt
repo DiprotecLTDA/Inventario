@@ -209,6 +209,10 @@ class CreateInventoryViewModel @Inject constructor(
         }
     }
 
+    fun clearMessages() {
+        _uiState.value = _uiState.value.copy(errorMessage = null)
+    }
+
     private fun isExpired(hasta: String?): Boolean {
         if (hasta.isNullOrBlank()) return false
 

@@ -32,8 +32,8 @@ data class LoginUiState(
     val loadingLogin: Boolean = false,
     val loadingSync: Boolean = false,
     val loadingSend: Boolean = false,
-    val error: String? = null,
-    val info: String? = null,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
     val needsPickKeyFile: Boolean = false,
     val goToSettings: Boolean = false
 )
@@ -62,7 +62,7 @@ class LoginViewModel @Inject constructor(
         if (!hasBase || !hasEmpresa || !hasApiKey || !hasAuth) {
             state.value = state.value.copy(
                 loadingBoot = false,
-                error = AppMessages.Configuration.FALTAN_PARAMETROS_DETALLE,
+                errorMessage = AppMessages.Configuration.FALTAN_PARAMETROS_DETALLE,
                 goToSettings = true
             )
             return
@@ -71,7 +71,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = state.value.copy(
                 loadingBoot = false,
-                error = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
+                errorMessage = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
                 goToSettings = true
             )
             return
@@ -79,8 +79,8 @@ class LoginViewModel @Inject constructor(
 
         state.value = state.value.copy(
             loadingBoot = false,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
@@ -89,16 +89,16 @@ class LoginViewModel @Inject constructor(
 
         state.value = state.value.copy(
             username = clean,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
     fun onPassChange(v: String) {
         state.value = state.value.copy(
             password = v,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
     }
 
@@ -110,7 +110,7 @@ class LoginViewModel @Inject constructor(
             state.value = s.copy(
                 username = "",
                 loadingLogin = false,
-                error = AppMessages.Login.RUT_INVALIDO
+                errorMessage = AppMessages.Login.RUT_INVALIDO
             )
             return
         }
@@ -118,7 +118,7 @@ class LoginViewModel @Inject constructor(
         if (s.password.isBlank()) {
             state.value = s.copy(
                 loadingLogin = false,
-                error = AppMessages.Login.INGRESE_CONTRASENA
+                errorMessage = AppMessages.Login.INGRESE_CONTRASENA
             )
             return
         }
@@ -126,7 +126,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = s.copy(
                 loadingLogin = false,
-                error = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
+                errorMessage = AppMessages.Device.NO_ACTIVADO_CONFIGURACION,
                 goToSettings = true
             )
             return
@@ -134,8 +134,8 @@ class LoginViewModel @Inject constructor(
 
         state.value = s.copy(
             loadingLogin = true,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
 
         viewModelScope.launch {
@@ -163,8 +163,8 @@ class LoginViewModel @Inject constructor(
 
                     state.value = state.value.copy(
                         loadingLogin = false,
-                        error = null,
-                        info = AppMessages.Login.INGRESO_EXITOSO
+                        errorMessage = null,
+                        successMessage = AppMessages.Login.INGRESO_EXITOSO
                     )
 
                     onLoggedIn()
@@ -173,7 +173,7 @@ class LoginViewModel @Inject constructor(
                 is AuthResult.Invalid -> {
                     state.value = state.value.copy(
                         loadingLogin = false,
-                        error = loginResult.reason
+                        errorMessage = loginResult.reason
                     )
                 }
             }
@@ -187,7 +187,7 @@ class LoginViewModel @Inject constructor(
         if (!settings.deviceActivated.value) {
             state.value = s.copy(
                 loadingSync = false,
-                error = AppMessages.Device.NO_ACTIVADO,
+                errorMessage = AppMessages.Device.NO_ACTIVADO,
                 goToSettings = true
             )
             return
@@ -195,8 +195,8 @@ class LoginViewModel @Inject constructor(
 
         state.value = s.copy(
             loadingSync = true,
-            error = null,
-            info = null
+            errorMessage = null,
+            successMessage = null
         )
 
         viewModelScope.launch {
@@ -219,7 +219,7 @@ class LoginViewModel @Inject constructor(
 
             state.value = state.value.copy(
                 loadingSync = false,
-                info = AppMessages.Login.resumenSincronizacion(
+                successMessage = AppMessages.Login.resumenSincronizacion(
                     users = users,
                     capturas = inventarioSync.capturas,
                     finalizados = inventarioSync.finalizados
@@ -239,7 +239,7 @@ class LoginViewModel @Inject constructor(
             if (raw.isNullOrBlank()) {
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO
+                    errorMessage = AppMessages.Credentials.NO_SE_PUDO_LEER_ARCHIVO
                 )
                 return@launch
             }
@@ -250,7 +250,7 @@ class LoginViewModel @Inject constructor(
             if (tokenFromFile.isNullOrBlank() || apiKeyFromFile.isNullOrBlank()) {
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = AppMessages.Credentials.ARCHIVO_SIN_CREDENCIALES_VALIDAS
+                    errorMessage = AppMessages.Credentials.ARCHIVO_SIN_CREDENCIALES_VALIDAS
                 )
                 return@launch
             }
@@ -270,14 +270,14 @@ class LoginViewModel @Inject constructor(
                 android.util.Log.e("LOGIN_BOOT", "settings.save failed", t)
                 state.value = state.value.copy(
                     loadingBoot = false,
-                    error = AppMessages.Credentials.noSePudoGuardar(t.message)
+                    errorMessage = AppMessages.Credentials.noSePudoGuardar(t.message)
                 )
                 return@launch
             }
 
             state.value = state.value.copy(
                 loadingBoot = true,
-                error = null
+                errorMessage = null
             )
 
             warmUp()
@@ -296,11 +296,10 @@ class LoginViewModel @Inject constructor(
         state.value = state.value.copy(goToSettings = false)
     }
 
-    fun clearError() {
-        state.value = state.value.copy(error = null)
-    }
-
-    fun clearInfo() {
-        state.value = state.value.copy(info = null)
+    fun clearMessages() {
+        state.value = state.value.copy(
+            errorMessage = null,
+            successMessage = null
+        )
     }
 }

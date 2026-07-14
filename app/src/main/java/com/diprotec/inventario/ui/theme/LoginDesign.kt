@@ -249,7 +249,7 @@ fun LoginDesignScreen(
 
                     Spacer(modifier = Modifier.height(18.dp))
 
-                    state.error?.let {
+                    state.errorMessage?.let {
                         Text(
                             text = it,
                             color = StatusError,
@@ -258,7 +258,7 @@ fun LoginDesignScreen(
                         )
                     }
 
-                    state.info?.let {
+                    state.successMessage?.let {
                         Text(
                             text = it,
                             color = StatusOnline,

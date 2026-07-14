@@ -76,10 +76,10 @@ fun SettingsScreen(
 
     var picking by remember { mutableStateOf(false) }
 
-    if (s.error != null) {
+    if (s.errorMessage != null) {
         ErrorDialog(
-            message = s.error ?: "",
-            onDismiss = { vm.clearError() }
+            message = s.errorMessage ?: "",
+            onDismiss = { vm.clearMessages() }
         )
     }
 
@@ -125,10 +125,10 @@ fun SettingsScreen(
         pickKeyFile.launch(intent)
     }
 
-    LaunchedEffect(s.info) {
-        s.info?.let {
+    LaunchedEffect(s.successMessage) {
+        s.successMessage?.let {
             AppFloatingMessage.info(it)
-            vm.clearInfo()
+            vm.clearMessages()
         }
     }
 
