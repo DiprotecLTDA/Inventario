@@ -1,9 +1,6 @@
 package com.diprotec.inventario.core.message
 
 object AppMessages {
-    const val ERROR_SERVIDOR_GENERICO =
-        "No se pudo completar la operación en el servidor."
-
     object Api {
         const val SIN_CONTENIDO = "El servidor respondió sin contenido."
         const val SIN_CONEXION =

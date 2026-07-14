@@ -5,6 +5,8 @@ import android.util.Log
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.device.GetSerialNumber
 import com.diprotec.inventario.core.message.AppMessages
+import com.diprotec.inventario.core.network.ApiCallExecutor
+import com.diprotec.inventario.core.network.ApiException
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.entity.SyncLogEntity
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
@@ -43,6 +45,7 @@ class SyncService @Inject constructor(
     private val inventoryRemoteRepository: InventoryRemoteRepository,
     private val versionService: VersionService,
     private val api: ApiService,
+    private val apiCallExecutor: ApiCallExecutor,
     private val settings: SettingsManager,
     private val inventoryRepository: InventoryRepository,
     private val syncLogRepository: SyncLogRepository,
@@ -101,41 +104,18 @@ class SyncService @Inject constructor(
             val jsonString = "\"$serial\""
             val body = jsonString.toRequestBody("application/json".toMediaType())
 
-            val http = api.loginDispositivo(
-                empresaRUT = empresaRut,
-                apiKey = apiKey,
-                authorization = authorizationHeader(),
-                serialNumberPlain = body
-            )
-
-            if (!http.isSuccessful) {
-                val err = runCatching { http.errorBody()?.string() }.getOrNull()
-                throw IllegalStateException(
-                    "LoginDispositivo HTTP ${http.code()} errBody=$err"
+            val response = apiCallExecutor.execute {
+                api.loginDispositivo(
+                    empresaRUT = empresaRut,
+                    apiKey = apiKey,
+                    authorization = authorizationHeader(),
+                    serialNumberPlain = body
                 )
             }
 
-            val resp = http.body()
-                ?: throw IllegalStateException("LoginDispositivo sin body")
-
-            if (resp.Estado != 200 || resp.Data.isNullOrBlank()) {
-                val serverMessage = resp.Respuesta?.trim().orEmpty()
-                val userMessage = serverMessage.ifBlank {
-                    AppMessages.ERROR_SERVIDOR_GENERICO
-                }
-
-                Log.w(
-                    TAG,
-                    "LoginDispositivo Estado=${resp.Estado} " +
-                            "Respuesta=${resp.Respuesta} " +
-                            "CodigoError=${resp.CodigoError}"
-                )
-
-                throw IllegalStateException(userMessage)
-            }
-
-            settings.saveDeviceSession(resp.Data)
-            resp.Data
+            val deviceSession = response.data.orEmpty()
+            settings.saveDeviceSession(deviceSession)
+            deviceSession
         }
     }
 
@@ -330,66 +310,41 @@ class SyncService @Inject constructor(
                     }
                 )
 
-                val response = api.sendRegistroInventario(
-                    empresaRUT = empresaRut,
-                    apiKey = headers.apiKey,
-                    authorization = headers.authorization,
-                    deviceSession = headers.deviceSession,
-                    deviceSignature = headers.deviceSignature,
-                    deviceTimestamp = headers.deviceTimestamp,
-                    body = request
+                val response = apiCallExecutor.execute {
+                    api.sendRegistroInventario(
+                        empresaRUT = empresaRut,
+                        apiKey = headers.apiKey,
+                        authorization = headers.authorization,
+                        deviceSession = headers.deviceSession,
+                        deviceSignature = headers.deviceSignature,
+                        deviceTimestamp = headers.deviceTimestamp,
+                        body = request
+                    )
+                }
+
+                val ids = capturas.map { it.id }
+                inventoryRepository.markCapturasSincronizadas(ids)
+                totalSincronizadas += ids.size
+                val successMessage = response.respuesta
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: AppMessages.ApiSync.CAPTURAS_ENVIADAS_CORRECTAMENTE
+
+                insertSyncLog(
+                    remoteInventoryId = inventarioId,
+                    inventoryName = inventoryName,
+                    eventType = EVENT_CAPTURES_SENT,
+                    capturesCount = ids.size,
+                    inventoryStatus = inventoryStatus,
+                    result = RESULT_ENVIADO,
+                    connectionMode = MODE_ONLINE_API,
+                    message = successMessage
                 )
 
-                if (response.Estado in 200..299) {
-                    val ids = capturas.map { it.id }
-                    inventoryRepository.markCapturasSincronizadas(ids)
-                    totalSincronizadas += ids.size
-                    val successMessage = response.Respuesta
-                        ?.trim()
-                        ?.takeIf { it.isNotBlank() }
-                        ?: AppMessages.ApiSync.CAPTURAS_ENVIADAS_CORRECTAMENTE
-
-                    insertSyncLog(
-                        remoteInventoryId = inventarioId,
-                        inventoryName = inventoryName,
-                        eventType = EVENT_CAPTURES_SENT,
-                        capturesCount = ids.size,
-                        inventoryStatus = inventoryStatus,
-                        result = RESULT_ENVIADO,
-                        connectionMode = MODE_ONLINE_API,
-                        message = successMessage
-                    )
-
-                    Log.d(
-                        TAG,
-                        "Inventario $inventarioId sincronizado. RutUsuario=$rutUsuario Capturas=${ids.size}"
-                    )
-                } else {
-                    val serverMessage = response.Respuesta?.trim().orEmpty()
-                    val userMessage = serverMessage.ifBlank {
-                        AppMessages.ERROR_SERVIDOR_GENERICO
-                    }
-
-                    Log.w(
-                        TAG,
-                        "SendRegistroInventario falló. Estado=${response.Estado}, " +
-                                "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
-                    )
-
-                    insertSyncLog(
-                        remoteInventoryId = inventarioId,
-                        inventoryName = inventoryName,
-                        eventType = EVENT_CAPTURES_FAILED,
-                        capturesCount = capturas.size,
-                        inventoryStatus = inventoryStatus,
-                        result = RESULT_ERROR,
-                        connectionMode = MODE_ONLINE_API,
-                        message = userMessage
-                    )
-
-                    failureLogged = true
-                    throw IllegalStateException(userMessage)
-                }
+                Log.d(
+                    TAG,
+                    "Inventario $inventarioId sincronizado. RutUsuario=$rutUsuario Capturas=${ids.size}"
+                )
             } catch (t: Throwable) {
                 if (!failureLogged) {
                     insertSyncLog(
@@ -456,72 +411,45 @@ class SyncService @Inject constructor(
                     relativeUrl = relativeUrl
                 )
 
-                val response = api.finishInventario(
-                    empresaRUT = empresaRut,
-                    apiKey = headers.apiKey,
-                    authorization = headers.authorization,
-                    deviceSession = headers.deviceSession,
-                    deviceSignature = headers.deviceSignature,
-                    deviceTimestamp = headers.deviceTimestamp,
-                    body = FinalizarInventarioRequest(
-                        InventarioId = inventarioId,
-                        UsuarioRUT = rutUsuario
+                val response = apiCallExecutor.execute {
+                    api.finishInventario(
+                        empresaRUT = empresaRut,
+                        apiKey = headers.apiKey,
+                        authorization = headers.authorization,
+                        deviceSession = headers.deviceSession,
+                        deviceSignature = headers.deviceSignature,
+                        deviceTimestamp = headers.deviceTimestamp,
+                        body = FinalizarInventarioRequest(
+                            InventarioId = inventarioId,
+                            UsuarioRUT = rutUsuario
+                        )
                     )
+                }
+
+                inventoryRepository.markFinishSynced(inventory.id)
+                total++
+                val successMessage = response.respuesta
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
+
+                insertSyncLog(
+                    remoteInventoryId = inventory.remoteInventoryId,
+                    inventoryName = inventory.name.ifBlank {
+                        "Inventario ${inventory.remoteInventoryId}"
+                    },
+                    eventType = EVENT_INVENTORY_FINISHED,
+                    capturesCount = 0,
+                    inventoryStatus = InventoryStatus.FINISHED.name,
+                    result = RESULT_ENVIADO,
+                    connectionMode = MODE_ONLINE_API,
+                    message = successMessage
                 )
 
-                if (response.Estado in 200..299) {
-                    inventoryRepository.markFinishSynced(inventory.id)
-                    total++
-                    val successMessage = response.Respuesta
-                        ?.trim()
-                        ?.takeIf { it.isNotBlank() }
-                        ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
-
-                    insertSyncLog(
-                        remoteInventoryId = inventory.remoteInventoryId,
-                        inventoryName = inventory.name.ifBlank {
-                            "Inventario ${inventory.remoteInventoryId}"
-                        },
-                        eventType = EVENT_INVENTORY_FINISHED,
-                        capturesCount = 0,
-                        inventoryStatus = InventoryStatus.FINISHED.name,
-                        result = RESULT_ENVIADO,
-                        connectionMode = MODE_ONLINE_API,
-                        message = successMessage
-                    )
-
-                    Log.d(
-                        TAG,
-                        "FinishInventario OK. localId=${inventory.id}, remoteId=${inventory.remoteInventoryId}, rutUsuario=$rutUsuario"
-                    )
-                } else {
-                    val serverMessage = response.Respuesta?.trim().orEmpty()
-                    val userMessage = serverMessage.ifBlank {
-                        AppMessages.ERROR_SERVIDOR_GENERICO
-                    }
-
-                    Log.w(
-                        TAG,
-                        "FinishInventario falló. Estado=${response.Estado}, " +
-                                "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
-                    )
-
-                    insertSyncLog(
-                        remoteInventoryId = inventory.remoteInventoryId,
-                        inventoryName = inventory.name.ifBlank {
-                            "Inventario ${inventory.remoteInventoryId}"
-                        },
-                        eventType = EVENT_FINISH_FAILED,
-                        capturesCount = 0,
-                        inventoryStatus = inventory.status,
-                        result = RESULT_ERROR,
-                        connectionMode = MODE_ONLINE_API,
-                        message = userMessage
-                    )
-
-                    failureLogged = true
-                    throw IllegalStateException(userMessage)
-                }
+                Log.d(
+                    TAG,
+                    "FinishInventario OK. localId=${inventory.id}, remoteId=${inventory.remoteInventoryId}, rutUsuario=$rutUsuario"
+                )
             } catch (t: Throwable) {
                 if (!failureLogged) {
                     insertSyncLog(
@@ -572,68 +500,41 @@ class SyncService @Inject constructor(
                 relativeUrl = relativeUrl
             )
 
-            val response = api.finishInventario(
-                empresaRUT = empresaRut,
-                apiKey = headers.apiKey,
-                authorization = headers.authorization,
-                deviceSession = headers.deviceSession,
-                deviceSignature = headers.deviceSignature,
-                deviceTimestamp = headers.deviceTimestamp,
-                body = FinalizarInventarioRequest(
-                    InventarioId = inventarioRemotoId,
-                    UsuarioRUT = usuarioRut
+            val response = apiCallExecutor.execute {
+                api.finishInventario(
+                    empresaRUT = empresaRut,
+                    apiKey = headers.apiKey,
+                    authorization = headers.authorization,
+                    deviceSession = headers.deviceSession,
+                    deviceSignature = headers.deviceSignature,
+                    deviceTimestamp = headers.deviceTimestamp,
+                    body = FinalizarInventarioRequest(
+                        InventarioId = inventarioRemotoId,
+                        UsuarioRUT = usuarioRut
+                    )
                 )
+            }
+
+            inventoryRepository.markFinishSynced(inventory.id)
+            val successMessage = response.respuesta
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+                ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
+
+            insertSyncLog(
+                remoteInventoryId = inventory.remoteInventoryId,
+                inventoryName = inventory.name.ifBlank {
+                    "Inventario ${inventory.remoteInventoryId}"
+                },
+                eventType = EVENT_INVENTORY_FINISHED,
+                capturesCount = 0,
+                inventoryStatus = InventoryStatus.FINISHED.name,
+                result = RESULT_ENVIADO,
+                connectionMode = MODE_ONLINE_API,
+                message = successMessage
             )
 
-            if (response.Estado in 200..299) {
-                inventoryRepository.markFinishSynced(inventory.id)
-                val successMessage = response.Respuesta
-                    ?.trim()
-                    ?.takeIf { it.isNotBlank() }
-                    ?: AppMessages.ApiSync.INVENTARIO_FINALIZADO_CORRECTAMENTE
-
-                insertSyncLog(
-                    remoteInventoryId = inventory.remoteInventoryId,
-                    inventoryName = inventory.name.ifBlank {
-                        "Inventario ${inventory.remoteInventoryId}"
-                    },
-                    eventType = EVENT_INVENTORY_FINISHED,
-                    capturesCount = 0,
-                    inventoryStatus = InventoryStatus.FINISHED.name,
-                    result = RESULT_ENVIADO,
-                    connectionMode = MODE_ONLINE_API,
-                    message = successMessage
-                )
-
-                true
-            } else {
-                val serverMessage = response.Respuesta?.trim().orEmpty()
-                val userMessage = serverMessage.ifBlank {
-                    AppMessages.ERROR_SERVIDOR_GENERICO
-                }
-
-                Log.w(
-                    TAG,
-                    "FinishInventario falló. Estado=${response.Estado}, " +
-                            "Respuesta=${response.Respuesta}, CodigoError=${response.CodigoError}"
-                )
-
-                insertSyncLog(
-                    remoteInventoryId = inventory.remoteInventoryId,
-                    inventoryName = inventory.name.ifBlank {
-                        "Inventario ${inventory.remoteInventoryId}"
-                    },
-                    eventType = EVENT_FINISH_FAILED,
-                    capturesCount = 0,
-                    inventoryStatus = inventory.status,
-                    result = RESULT_ERROR,
-                    connectionMode = MODE_ONLINE_API,
-                    message = userMessage
-                )
-
-                failureLogged = true
-                throw IllegalStateException(userMessage)
-            }
+            true
         } catch (t: Throwable) {
             if (!failureLogged) {
                 insertSyncLog(
@@ -730,7 +631,10 @@ class SyncService @Inject constructor(
     }
 
     private fun connectionModeForError(t: Throwable): String {
-        return if (t is IOException) {
+        return if (
+            t is IOException ||
+            (t is ApiException && t.cause is IOException)
+        ) {
             MODE_LOCAL_ROOM
         } else {
             MODE_ONLINE_API

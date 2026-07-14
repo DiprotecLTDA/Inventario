@@ -1,14 +1,22 @@
 package com.diprotec.inventario.data.remote.dto
 
+import com.diprotec.inventario.core.network.BaseApiResponse
+import com.squareup.moshi.Json
+
 data class FinalizarInventarioRequest(
     val InventarioId: Long,
     val UsuarioRUT: String
 )
 
 data class FinalizarInventarioResponse(
-    val Estado: Int,
-    val Respuesta: String?,
-    val Data: Map<String, Any?>?,
-    val CodigoError: String?,
-    val CorrelationId: String?
-)
+    @Json(name = "Estado") val estado: Int,
+    @Json(name = "Respuesta") val respuesta: String?,
+    @Json(name = "Data") val data: Map<String, Any?>?,
+    @Json(name = "CodigoError") val codigoError: String?,
+    @Json(name = "CorrelationId") val correlationId: String?
+) : BaseApiResponse {
+    override val apiEstado get() = estado
+    override val apiRespuesta get() = respuesta
+    override val apiCodigoError get() = codigoError
+    override val apiCorrelationId get() = correlationId
+}

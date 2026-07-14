@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.diprotec.inventario.BuildConfig
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.network.BaseUrlProvider
+import com.diprotec.inventario.core.network.ApiCallExecutor
 import com.diprotec.inventario.core.network.DynamicBaseUrlInterceptor
 import com.diprotec.inventario.core.network.NetworkUsageInterceptor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
@@ -278,11 +279,13 @@ object AppModule {
     fun userRepo(
         userDao: UserDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): UserRepository = UserRepositoryImpl(
         userDao = userDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )
@@ -292,11 +295,13 @@ object AppModule {
     fun reglaRepo(
         ruleDao: RuleDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): RuleRepository = RuleRepositoryImpl(
         ruleDao = ruleDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )
@@ -306,11 +311,13 @@ object AppModule {
     fun ubicacionRepo(
         locationDao: LocationDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): LocationRepository = LocationRepositoryImpl(
         locationDao = locationDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )
@@ -320,11 +327,13 @@ object AppModule {
     fun productoRepo(
         productDao: ProductDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): ProductRepository = ProductRepositoryImpl(
         productDao = productDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )
@@ -334,11 +343,13 @@ object AppModule {
     fun unidadMedidaRepo(
         unitMeasureDao: UnitMeasureDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): UnitMeasureRepository = UnitMeasureRepositoryImpl(
         unitMeasureDao = unitMeasureDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )
@@ -359,11 +370,13 @@ object AppModule {
     fun inventarioRemotoRepo(
         inventoryRemoteDao: InventoryRemoteDao,
         api: ApiService,
+        apiCallExecutor: ApiCallExecutor,
         settings: SettingsManager,
         headersBuilder: ProtectedHeadersBuilder
     ): InventoryRemoteRepository = InventoryRemoteRepositoryImpl(
         dao = inventoryRemoteDao,
         api = api,
+        apiCallExecutor = apiCallExecutor,
         settings = settings,
         headersBuilder = headersBuilder
     )

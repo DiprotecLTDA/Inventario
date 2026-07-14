@@ -1,18 +1,16 @@
 package com.diprotec.inventario.service
 
-import android.util.Log
 import com.diprotec.inventario.core.config.SettingsManager
-import com.diprotec.inventario.core.message.AppMessages
+import com.diprotec.inventario.core.network.ApiCallExecutor
 import com.diprotec.inventario.data.remote.api.ApiService
 import com.diprotec.inventario.data.remote.dto.ActivateDispositivoRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "ActivateDevice"
-
 @Singleton
 class ActivateDeviceService @Inject constructor(
     private val api: ApiService,
+    private val apiCallExecutor: ApiCallExecutor,
     private val settings: SettingsManager
 ) {
 
@@ -28,44 +26,20 @@ class ActivateDeviceService @Inject constructor(
         activationCode: String,
         publicKey: String
     ): String {
-        val http = api.activateDispositivo(
-            empresaRUT = empresaRut,
-            apiKey = settings.apiKey.value.trim(),
-            authorization = authorizationHeader(),
-            body = ActivateDispositivoRequest(
-                SerialNumber = serialNumber,
-                ActivationCode = activationCode,
-                PublicKey = publicKey
-            )
-        )
-
-        if (!http.isSuccessful) {
-            val err = runCatching { http.errorBody()?.string() }.getOrNull()
-            throw IllegalStateException(
-                "ActivateDispositivo HTTP ${http.code()} errBody=$err"
+        val response = apiCallExecutor.execute {
+            api.activateDispositivo(
+                empresaRUT = empresaRut,
+                apiKey = settings.apiKey.value.trim(),
+                authorization = authorizationHeader(),
+                body = ActivateDispositivoRequest(
+                    SerialNumber = serialNumber,
+                    ActivationCode = activationCode,
+                    PublicKey = publicKey
+                )
             )
         }
 
-        val resp = http.body()
-            ?: throw IllegalStateException("ActivateDispositivo sin body")
-
-        if (resp.Estado != 0 && resp.Estado != 200) {
-            val serverMessage = resp.Respuesta?.trim().orEmpty()
-            val userMessage = serverMessage.ifBlank {
-                AppMessages.ERROR_SERVIDOR_GENERICO
-            }
-
-            Log.w(
-                TAG,
-                "ActivateDispositivo Estado=${resp.Estado} " +
-                        "Respuesta=${resp.Respuesta} " +
-                        "CodigoError=${resp.CodigoError}"
-            )
-
-            throw IllegalStateException(userMessage)
-        }
-
-        val deviceId = extractDeviceId(resp.Data)
+        val deviceId = extractDeviceId(response.data)
 
         if (deviceId.isBlank()) {
             throw IllegalStateException("ActivateDispositivo no devolvió DispositivoId")

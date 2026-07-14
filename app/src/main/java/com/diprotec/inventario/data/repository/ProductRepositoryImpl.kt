@@ -2,6 +2,7 @@ package com.diprotec.inventario.data.repository
 
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.message.AppMessages
+import com.diprotec.inventario.core.network.ApiCallExecutor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.dao.ProductDao
 import com.diprotec.inventario.data.local.entity.ProductEntity
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 class ProductRepositoryImpl @Inject constructor(
     private val productDao: ProductDao,
     private val api: ApiService,
+    private val apiCallExecutor: ApiCallExecutor,
     private val settings: SettingsManager,
     private val headersBuilder: ProtectedHeadersBuilder
 ) : ProductRepository {
@@ -29,14 +31,16 @@ class ProductRepositoryImpl @Inject constructor(
             relativeUrl = relativeUrl
         )
 
-        return api.getProductos(
-            empresaRUT = empresaRut,
-            apiKey = headers.apiKey,
-            authorization = headers.authorization,
-            deviceSession = headers.deviceSession,
-            deviceSignature = headers.deviceSignature,
-            deviceTimestamp = headers.deviceTimestamp
-        ).data
+        return apiCallExecutor.execute {
+            api.getProductos(
+                empresaRUT = empresaRut,
+                apiKey = headers.apiKey,
+                authorization = headers.authorization,
+                deviceSession = headers.deviceSession,
+                deviceSignature = headers.deviceSignature,
+                deviceTimestamp = headers.deviceTimestamp
+            )
+        }.data
     }
 
     override suspend fun replaceAllProductos(list: List<ProductEntity>) {

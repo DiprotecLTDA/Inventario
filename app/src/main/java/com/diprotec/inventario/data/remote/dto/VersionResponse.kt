@@ -1,5 +1,6 @@
 package com.diprotec.inventario.data.remote.dto
 
+import com.diprotec.inventario.core.network.BaseApiResponse
 import com.squareup.moshi.Json
 
 data class VersionEntradaRequest(
@@ -16,7 +17,12 @@ data class VersionResponse(
     @Json(name = "Data") val data: VersionCheckDataDto?,
     @Json(name = "CodigoError") val codigoError: String?,
     @Json(name = "CorrelationId") val correlationId: String?
-)
+) : BaseApiResponse {
+    override val apiEstado get() = estado
+    override val apiRespuesta get() = respuesta
+    override val apiCodigoError get() = codigoError
+    override val apiCorrelationId get() = correlationId
+}
 
 class VersionCheckDataDto(
     @Json(name = "PuedeOperar") private val puedeOperarRaw: Any?,

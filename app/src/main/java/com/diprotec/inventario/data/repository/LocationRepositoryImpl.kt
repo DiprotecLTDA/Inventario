@@ -2,6 +2,7 @@ package com.diprotec.inventario.data.repository
 
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.message.AppMessages
+import com.diprotec.inventario.core.network.ApiCallExecutor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.local.dao.LocationDao
 import com.diprotec.inventario.data.local.entity.LocationEntity
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 class LocationRepositoryImpl @Inject constructor(
     private val locationDao: LocationDao,
     private val api: ApiService,
+    private val apiCallExecutor: ApiCallExecutor,
     private val settings: SettingsManager,
     private val headersBuilder: ProtectedHeadersBuilder
 ) : LocationRepository {
@@ -29,14 +31,16 @@ class LocationRepositoryImpl @Inject constructor(
             relativeUrl = relativeUrl
         )
 
-        return api.getUbicaciones(
-            empresaRUT = empresaRut,
-            apiKey = headers.apiKey,
-            authorization = headers.authorization,
-            deviceSession = headers.deviceSession,
-            deviceSignature = headers.deviceSignature,
-            deviceTimestamp = headers.deviceTimestamp
-        ).data
+        return apiCallExecutor.execute {
+            api.getUbicaciones(
+                empresaRUT = empresaRut,
+                apiKey = headers.apiKey,
+                authorization = headers.authorization,
+                deviceSession = headers.deviceSession,
+                deviceSignature = headers.deviceSignature,
+                deviceTimestamp = headers.deviceTimestamp
+            )
+        }.data
     }
 
     override suspend fun replaceAllUbicaciones(list: List<LocationEntity>) {

@@ -33,7 +33,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): UsersResponse
+    ): Response<UsersResponse>
 
     @GET("api/website/v1/reglas/{empresaRUT}/GetReglas")
     suspend fun getReglas(
@@ -43,7 +43,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): ReglasResponse
+    ): Response<ReglasResponse>
 
     @GET("api/website/v1/ubicaciones/{empresaRUT}/GetUbicaciones")
     suspend fun getUbicaciones(
@@ -53,7 +53,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): UbicacionesResponse
+    ): Response<UbicacionesResponse>
 
     @POST("api/website/v1/dispositivos/{empresaRUT}/LoginDispositivo")
     suspend fun loginDispositivo(
@@ -80,7 +80,7 @@ interface ApiService {
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String,
         @Body body: VersionEntradaRequest
-    ): VersionResponse
+    ): Response<VersionResponse>
 
     @GET("api/website/v1/productos/{empresaRUT}/GetProductos")
     suspend fun getProductos(
@@ -90,7 +90,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): ProductosResponse
+    ): Response<ProductosResponse>
 
     @GET("api/website/v1/unidadmedidas/{empresaRUT}/GetUnidadMedidas")
     suspend fun getUnidadMedidas(
@@ -100,7 +100,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): UnidadMedidasResponse
+    ): Response<UnidadMedidasResponse>
 
     @GET("api/website/v1/inventarios/{empresaRUT}/GetInventarios")
     suspend fun getInventarios(
@@ -110,7 +110,7 @@ interface ApiService {
         @Header("X-DEVICE-SESSION") deviceSession: String,
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String
-    ): InventariosResponse
+    ): Response<InventariosResponse>
 
     @POST("api/website/v1/inventarios/{empresaRUT}/SendRegistroInventario")
     suspend fun sendRegistroInventario(
@@ -121,7 +121,7 @@ interface ApiService {
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String,
         @Body body: RegistroInventarioRequest
-    ): SendRegistroInventarioResponse
+    ): Response<SendRegistroInventarioResponse>
 
     @POST("api/website/v1/inventarios/{empresaRUT}/FinishInventario")
     suspend fun finishInventario(
@@ -132,6 +132,6 @@ interface ApiService {
         @Header("X-DEVICE-SIGNATURE") deviceSignature: String,
         @Header("X-DEVICE-TIMESTAMP") deviceTimestamp: String,
         @Body body: FinalizarInventarioRequest
-    ): FinalizarInventarioResponse
+    ): Response<FinalizarInventarioResponse>
 }
 

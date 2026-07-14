@@ -1,5 +1,6 @@
 package com.diprotec.inventario.data.remote.dto
 
+import com.diprotec.inventario.core.network.BaseApiResponse
 import com.squareup.moshi.Json
 
 data class UsersResponse(
@@ -8,7 +9,12 @@ data class UsersResponse(
     @Json(name = "Data") val data: List<UserDto>,
     @Json(name = "CodigoError") val codigoError: String?,
     @Json(name = "CorrelationId") val correlationId: String?
-)
+) : BaseApiResponse {
+    override val apiEstado get() = estado
+    override val apiRespuesta: String? get() = respuesta
+    override val apiCodigoError get() = codigoError
+    override val apiCorrelationId get() = correlationId
+}
 
 data class UserDto(
     @Json(name = "Rut") val rut: String,

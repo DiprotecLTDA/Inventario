@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.network.ApiCallExecutor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.data.remote.api.ApiService
 import com.diprotec.inventario.data.remote.dto.VersionCheckDataDto
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class VersionService @Inject constructor(
     private val api: ApiService,
+    private val apiCallExecutor: ApiCallExecutor,
     private val settings: SettingsManager,
     private val headersBuilder: ProtectedHeadersBuilder,
     @ApplicationContext private val context: Context
@@ -92,22 +94,22 @@ class VersionService @Inject constructor(
                 modelo = modelo
             )
 
-            val response = api.getVersion(
-                empresaRUT = empresaRut,
-                apiKey = headers.apiKey,
-                authorization = headers.authorization,
-                deviceSession = headers.deviceSession,
-                deviceSignature = headers.deviceSignature,
-                deviceTimestamp = headers.deviceTimestamp,
-                body = request
-            )
+            val response = apiCallExecutor.execute {
+                api.getVersion(
+                    empresaRUT = empresaRut,
+                    apiKey = headers.apiKey,
+                    authorization = headers.authorization,
+                    deviceSession = headers.deviceSession,
+                    deviceSignature = headers.deviceSignature,
+                    deviceTimestamp = headers.deviceTimestamp,
+                    body = request
+                )
+            }
 
             Log.d("VERSION_SYNC", "estado=${response.estado}")
             Log.d("VERSION_SYNC", "respuesta=${response.respuesta}")
             Log.d("VERSION_SYNC", "codigoError=${response.codigoError}")
             Log.d("VERSION_SYNC", "correlationId=${response.correlationId}")
-
-            if (response.estado != 200) return null
 
             val data = response.data
             val version = data?.version
