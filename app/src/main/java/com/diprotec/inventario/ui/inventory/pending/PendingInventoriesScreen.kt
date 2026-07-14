@@ -23,10 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.data.local.entity.InventoryEntity
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
-import com.diprotec.inventario.ui.theme.Background
+import com.diprotec.inventario.ui.components.AppCard
 import com.diprotec.inventario.ui.components.InventoryTopBar
-import com.diprotec.inventario.ui.components.OutlinedInfoCard
 import com.diprotec.inventario.ui.components.SegmentedToggle
+import com.diprotec.inventario.ui.theme.Background
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.TextPrimary
 
 @Composable
@@ -51,7 +52,7 @@ fun PendingInventoriesScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 18.dp)
+                .padding(horizontal = Dimens.spaceXl, vertical = 18.dp)
         ) {
             PendingFinishedSelector(
                 filter = filter,
@@ -63,7 +64,7 @@ fun PendingInventoriesScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceL))
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -110,13 +111,13 @@ private fun InventoryCard(
     item: InventoryEntity,
     onClick: () -> Unit
 ) {
-    OutlinedInfoCard(
+    AppCard(
         modifier = Modifier
             .fillMaxWidth(),
         onClick = onClick
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimens.spaceXs)
         ) {
             Text(
                 text = item.name,
