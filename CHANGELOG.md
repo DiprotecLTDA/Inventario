@@ -31,6 +31,20 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   (`fallbackToDestructiveMigrationFrom`), evitando el borrado silencioso de datos
   no sincronizados ante huecos de migración.
 - Nombres de color renombrados de `Teal*`/`ButtonRed*` a tokens de marca reales.
+- **Refactor DRY en `SyncService`**: helper genérico `syncCatalog(label, fetch, map, replace)`
+  del que dependen los cinco catálogos (usuarios, reglas, ubicaciones, productos, unidades de
+  medida); `syncInventariosRemotos` se mantiene aparte. Comportamiento, logs y excepciones
+  idénticos.
+- **Refactor DRY en workers**: nuevo `worker/SyncWorkRunner.kt` con el manejo común de errores
+  (`IOException` → retry, HTTP ≥ 500 → retry / resto → failure, inesperado configurable).
+  `CatalogSyncWorker`, `PendingInventorySyncWorker` y `StartupSyncWorker` lo usan preservando su
+  semántica exacta de `failure`/`retry` (Pending reintenta ante error inesperado; los otros
+  fallan).
+- Indicador de sesión en `MainMenuScreen` usa el token `BrandPrimary` en vez de un color hex
+  hardcodeado.
+- **Estandarización de nombres de archivo** para coincidir con su clase:
+  `DynamicBaseUrlinterceptor.kt` → `DynamicBaseUrlInterceptor.kt` y
+  `UserRepositoryimpl.kt` → `UserRepositoryImpl.kt`.
 
 ### Corregido
 - **Riesgo de pérdida de datos**: hueco de migración `26 → 27` que, con el fallback
@@ -40,6 +54,10 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   un rojo distinguible (`#D32F2F`).
 - API deprecadas en pantalla de consumo de datos (`Divider`, `ArrowBack`).
 - `String.format` sin `Locale` en el formateo de tamaño en "Acerca de".
+- **`UserRepositoryImpl.replaceAllUsers` ahora es atómico**: usa `userDao.replaceAll(list)`
+  (`@Transaction`) en vez de `clearAll()` + `upsertAll()` sueltos, evitando dejar la tabla de
+  usuarios vacía si el proceso se interrumpe entre ambas llamadas. Consistente con el resto de
+  los repositorios de catálogo.
 
 ### Eliminado
 - Código muerto verificado (0 usos): clúster `Barcode*`
