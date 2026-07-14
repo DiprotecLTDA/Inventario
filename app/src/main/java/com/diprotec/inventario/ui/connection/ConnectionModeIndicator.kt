@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.diprotec.inventario.ui.theme.StatusChip
+import com.diprotec.inventario.ui.components.StatusChip
 import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.StatusOnline
 import com.diprotec.inventario.ui.theme.StatusWarning

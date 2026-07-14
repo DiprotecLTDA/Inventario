@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.theme.Background
-import com.diprotec.inventario.ui.theme.InventoryTopBar
-import com.diprotec.inventario.ui.theme.OutlinedInfoCard
+import com.diprotec.inventario.ui.components.InventoryTopBar
+import com.diprotec.inventario.ui.components.OutlinedInfoCard
 import com.diprotec.inventario.ui.theme.TextPrimary
 
 @Composable

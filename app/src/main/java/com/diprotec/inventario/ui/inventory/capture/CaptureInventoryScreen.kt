@@ -66,7 +66,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.ui.common.AppFloatingMessage
 import com.diprotec.inventario.ui.scan.UnitechScan
-import com.diprotec.inventario.ui.theme.AppPrimaryButton
+import com.diprotec.inventario.ui.components.AppPrimaryButton
+import com.diprotec.inventario.ui.components.inventoryTextFieldColors
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BrandPrimary
 import com.diprotec.inventario.ui.theme.BrandPrimaryDark
@@ -75,7 +76,6 @@ import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
-import com.diprotec.inventario.ui.theme.inventoryTextFieldColors
 import kotlinx.coroutines.delay
 
 private const val TAG_SCAN_CAPTURE = "SCAN_CAPTURE"

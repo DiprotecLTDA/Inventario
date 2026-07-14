@@ -36,12 +36,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BorderGray
 import com.diprotec.inventario.ui.theme.StatusError
-import com.diprotec.inventario.ui.theme.InventoryTopBar
+import com.diprotec.inventario.ui.components.InventoryTopBar
+import com.diprotec.inventario.ui.components.inventoryTextFieldColors
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.LabelGray
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
-import com.diprotec.inventario.ui.theme.inventoryTextFieldColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

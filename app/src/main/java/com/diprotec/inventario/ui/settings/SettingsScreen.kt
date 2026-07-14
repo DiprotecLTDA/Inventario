@@ -51,14 +51,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.common.AppFloatingMessage
-import com.diprotec.inventario.ui.theme.AppPrimaryButton
+import com.diprotec.inventario.ui.components.AppPrimaryButton
+import com.diprotec.inventario.ui.components.InventoryTopBar
+import com.diprotec.inventario.ui.components.inventoryTextFieldColors
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
-import com.diprotec.inventario.ui.theme.InventoryTopBar
 import com.diprotec.inventario.ui.theme.LabelGray
 import com.diprotec.inventario.ui.theme.SuccessBg
 import com.diprotec.inventario.ui.theme.SuccessBorder
 import com.diprotec.inventario.ui.theme.TextPrimary
-import com.diprotec.inventario.ui.theme.inventoryTextFieldColors
 import kotlinx.coroutines.launch
 
 @Composable

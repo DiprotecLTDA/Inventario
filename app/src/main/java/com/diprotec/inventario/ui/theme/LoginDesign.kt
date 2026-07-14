@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.diprotec.inventario.R
+import com.diprotec.inventario.ui.components.inventoryTextFieldColors
 import com.diprotec.inventario.ui.login.LoginUiState
 
 @Composable

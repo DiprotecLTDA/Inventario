@@ -1,5 +1,6 @@
-package com.diprotec.inventario.ui.theme
+package com.diprotec.inventario.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,9 +22,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,9 +40,176 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.diprotec.inventario.ui.theme.AppShapes
+import com.diprotec.inventario.ui.theme.BorderGray
+import com.diprotec.inventario.ui.theme.BrandAccent
+import com.diprotec.inventario.ui.theme.BrandPrimary
+import com.diprotec.inventario.ui.theme.Dimens
+import com.diprotec.inventario.ui.theme.LabelGray
+import com.diprotec.inventario.ui.theme.StatusError
+import com.diprotec.inventario.ui.theme.TextPrimary
+import com.diprotec.inventario.ui.theme.White
+
+enum class AppActionButtonStyle {
+    PRIMARY,
+    SECONDARY,
+    OUTLINE
+}
+
+@Composable
+fun AppActionButton(
+    text: String,
+    onClick: () -> Unit,
+    style: AppActionButtonStyle = AppActionButtonStyle.PRIMARY,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    icon: ImageVector? = null,
+    modifier: Modifier = Modifier
+) {
+    val containerColor = when (style) {
+        AppActionButtonStyle.PRIMARY -> BrandPrimary
+        AppActionButtonStyle.SECONDARY -> BrandAccent
+        AppActionButtonStyle.OUTLINE -> Color.Transparent
+    }
+    val contentColor = when (style) {
+        AppActionButtonStyle.PRIMARY -> MaterialTheme.colorScheme.onPrimary
+        AppActionButtonStyle.SECONDARY -> MaterialTheme.colorScheme.onSecondary
+        AppActionButtonStyle.OUTLINE -> TextPrimary
+    }
+    val border = when (style) {
+        AppActionButtonStyle.OUTLINE -> BorderStroke(Dimens.borderThin, BorderGray)
+        else -> null
+    }
+
+    Surface(
+        onClick = onClick,
+        enabled = enabled && !loading,
+        shape = AppShapes.large,
+        color = containerColor,
+        contentColor = contentColor,
+        border = border,
+        modifier = modifier.heightIn(min = Dimens.actionButtonMinHeight)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Dimens.actionButtonMinHeight)
+                .padding(horizontal = Dimens.spaceL),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(Dimens.iconM),
+                    color = contentColor,
+                    strokeWidth = Dimens.borderThick
+                )
+            } else {
+                icon?.let {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = text,
+                        modifier = Modifier.size(Dimens.iconM)
+                    )
+
+                    Spacer(modifier = Modifier.width(Dimens.spaceS))
+                }
+
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AppCard(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    content: @Composable BoxScope.() -> Unit
+) {
+    OutlinedInfoCard(
+        modifier = modifier,
+        onClick = onClick,
+        contentPadding = PaddingValues(Dimens.spaceL),
+        content = content
+    )
+}
+
+@Composable
+fun AppTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.heightIn(min = Dimens.fieldMinHeight),
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = MaterialTheme.typography.bodyLarge,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        supportingText = supportingText,
+        isError = isError,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        minLines = minLines,
+        shape = AppShapes.small,
+        colors = inventoryTextFieldColors()
+    )
+}
+
+@Composable
+fun SectionTitle(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        color = TextPrimary,
+        style = MaterialTheme.typography.titleMedium
+    )
+}
+
+@Composable
+fun StatusDot(
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(Dimens.dot)
+            .background(color, CircleShape)
+    )
+}
 
 @Composable
 fun InventoryTopBar(
@@ -88,11 +259,7 @@ fun StatusChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Box(
-                modifier = Modifier
-                    .size(12.dp)
-                    .background(dotColor, CircleShape)
-            )
+            StatusDot(color = dotColor)
 
             Spacer(modifier = Modifier.size(8.dp))
 
@@ -179,18 +346,18 @@ private fun SegmentedToggleOption(
 fun OutlinedInfoCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(16.dp),
+    contentPadding: PaddingValues = PaddingValues(Dimens.spaceL),
     tonalElevation: Dp = 0.dp,
     shadowElevation: Dp = 0.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = AppShapes.medium,
         color = White,
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
         modifier = modifier
-            .border(1.dp, BorderGray, RoundedCornerShape(16.dp))
+            .border(Dimens.borderThin, BorderGray, AppShapes.medium)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
     ) {
         Box(

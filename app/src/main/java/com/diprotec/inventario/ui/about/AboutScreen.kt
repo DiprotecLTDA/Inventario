@@ -34,10 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.common.AppFloatingMessage
-import com.diprotec.inventario.ui.theme.AppPrimaryButton
+import com.diprotec.inventario.ui.components.AppPrimaryButton
+import com.diprotec.inventario.ui.components.InventoryTopBar
+import com.diprotec.inventario.ui.components.OutlinedInfoCard
 import com.diprotec.inventario.ui.theme.Background
-import com.diprotec.inventario.ui.theme.InventoryTopBar
-import com.diprotec.inventario.ui.theme.OutlinedInfoCard
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
 import com.diprotec.inventario.ui.update.StartupUpdateDialog
