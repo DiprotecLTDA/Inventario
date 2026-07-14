@@ -53,6 +53,7 @@ import com.diprotec.inventario.ui.connection.AppConnectionMode
 import com.diprotec.inventario.ui.connection.ConnectionModeIndicator
 import com.diprotec.inventario.ui.syncstatus.WorkerTrafficLight
 import com.diprotec.inventario.ui.theme.Background
+import com.diprotec.inventario.ui.theme.BrandPrimary
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.TextPrimary
 import com.diprotec.inventario.ui.theme.White
@@ -278,7 +279,7 @@ private fun SessionTimeIndicator(
             Box(
                 modifier = Modifier
                     .size(12.dp)
-                    .background(Color(0xFFC63428), CircleShape)
+                    .background(BrandPrimary, CircleShape)
             )
 
             Spacer(modifier = Modifier.size(8.dp))
