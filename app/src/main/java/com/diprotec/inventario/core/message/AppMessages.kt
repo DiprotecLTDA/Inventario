@@ -4,6 +4,21 @@ object AppMessages {
     const val ERROR_SERVIDOR_GENERICO =
         "No se pudo completar la operación en el servidor."
 
+    object Api {
+        const val SIN_CONTENIDO = "El servidor respondió sin contenido."
+        const val SIN_CONEXION =
+            "No fue posible conectarse al servidor. Verifique su conexión a Internet."
+        const val TIMEOUT = "El servidor tardó demasiado en responder."
+        const val COMUNICACION = "Ocurrió un problema de comunicación con el servidor."
+        const val GENERICO = "No fue posible completar la operación."
+        const val HTTP_400 = "Los datos enviados son inválidos o están incompletos."
+        const val HTTP_401 = "No fue posible autorizar la operación."
+        const val HTTP_403 =
+            "El dispositivo no tiene autorización para realizar esta operación."
+        const val HTTP_500 = "El servidor presentó un error interno."
+        const val HTTP_5XX = "El servidor no pudo completar la operación."
+    }
+
     object Configuration {
         const val EMPRESA_RUT_NO_CONFIGURADO = "Empresa RUT no configurado"
         const val AUTHORIZATION_NO_CONFIGURADO = "Authorization no configurado"
