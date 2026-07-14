@@ -283,8 +283,6 @@ class SyncService @Inject constructor(
 
             val inventoryStatus = inventory?.status ?: InventoryStatus.PENDING.name
 
-            var failureLogged = false
-
             try {
                 val relativeUrl =
                     "/api/website/v1/inventarios/$empresaRut/SendRegistroInventario"
@@ -346,18 +344,16 @@ class SyncService @Inject constructor(
                     "Inventario $inventarioId sincronizado. RutUsuario=$rutUsuario Capturas=${ids.size}"
                 )
             } catch (t: Throwable) {
-                if (!failureLogged) {
-                    insertSyncLog(
-                        remoteInventoryId = inventarioId,
-                        inventoryName = inventoryName,
-                        eventType = EVENT_CAPTURES_FAILED,
-                        capturesCount = capturas.size,
-                        inventoryStatus = inventoryStatus,
-                        result = RESULT_ERROR,
-                        connectionMode = connectionModeForError(t),
-                        message = t.message ?: t::class.java.simpleName
-                    )
-                }
+                insertSyncLog(
+                    remoteInventoryId = inventarioId,
+                    inventoryName = inventoryName,
+                    eventType = EVENT_CAPTURES_FAILED,
+                    capturesCount = capturas.size,
+                    inventoryStatus = inventoryStatus,
+                    result = RESULT_ERROR,
+                    connectionMode = connectionModeForError(t),
+                    message = t.message ?: t::class.java.simpleName
+                )
 
                 throw t
             }
@@ -399,8 +395,6 @@ class SyncService @Inject constructor(
                         "Inventario ${inventory.remoteInventoryId} sin rut de usuario para finalizar"
                     )
                 }
-
-            var failureLogged = false
 
             try {
                 val relativeUrl =
@@ -451,20 +445,18 @@ class SyncService @Inject constructor(
                     "FinishInventario OK. localId=${inventory.id}, remoteId=${inventory.remoteInventoryId}, rutUsuario=$rutUsuario"
                 )
             } catch (t: Throwable) {
-                if (!failureLogged) {
-                    insertSyncLog(
-                        remoteInventoryId = inventory.remoteInventoryId,
-                        inventoryName = inventory.name.ifBlank {
-                            "Inventario ${inventory.remoteInventoryId}"
-                        },
-                        eventType = EVENT_FINISH_FAILED,
-                        capturesCount = 0,
-                        inventoryStatus = inventory.status,
-                        result = RESULT_ERROR,
-                        connectionMode = connectionModeForError(t),
-                        message = t.message ?: t::class.java.simpleName
-                    )
-                }
+                insertSyncLog(
+                    remoteInventoryId = inventory.remoteInventoryId,
+                    inventoryName = inventory.name.ifBlank {
+                        "Inventario ${inventory.remoteInventoryId}"
+                    },
+                    eventType = EVENT_FINISH_FAILED,
+                    capturesCount = 0,
+                    inventoryStatus = inventory.status,
+                    result = RESULT_ERROR,
+                    connectionMode = connectionModeForError(t),
+                    message = t.message ?: t::class.java.simpleName
+                )
 
                 throw t
             }
@@ -488,8 +480,6 @@ class SyncService @Inject constructor(
             ?: throw IllegalStateException("remoteInventoryId inválido: ${inventory.remoteInventoryId}")
 
         val empresaRut = settings.empresaRut.value.trim()
-
-        var failureLogged = false
 
         try {
             val relativeUrl =
@@ -536,20 +526,18 @@ class SyncService @Inject constructor(
 
             true
         } catch (t: Throwable) {
-            if (!failureLogged) {
-                insertSyncLog(
-                    remoteInventoryId = inventory.remoteInventoryId,
-                    inventoryName = inventory.name.ifBlank {
-                        "Inventario ${inventory.remoteInventoryId}"
-                    },
-                    eventType = EVENT_FINISH_FAILED,
-                    capturesCount = 0,
-                    inventoryStatus = inventory.status,
-                    result = RESULT_ERROR,
-                    connectionMode = connectionModeForError(t),
-                    message = t.message ?: t::class.java.simpleName
-                )
-            }
+            insertSyncLog(
+                remoteInventoryId = inventory.remoteInventoryId,
+                inventoryName = inventory.name.ifBlank {
+                    "Inventario ${inventory.remoteInventoryId}"
+                },
+                eventType = EVENT_FINISH_FAILED,
+                capturesCount = 0,
+                inventoryStatus = inventory.status,
+                result = RESULT_ERROR,
+                connectionMode = connectionModeForError(t),
+                message = t.message ?: t::class.java.simpleName
+            )
 
             throw t
         }
