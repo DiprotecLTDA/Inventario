@@ -31,10 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.data.local.dao.NetworkUsageGroupRow
 import com.diprotec.inventario.ui.common.AppFloatingMessage
+import com.diprotec.inventario.ui.components.AppCard
 import com.diprotec.inventario.ui.components.AppPrimaryButton
-import com.diprotec.inventario.ui.components.OutlinedInfoCard
+import com.diprotec.inventario.ui.components.SectionTitle
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BorderGray
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.InventoryMenuButton
 import com.diprotec.inventario.ui.theme.TextPrimary
 
@@ -58,7 +60,7 @@ fun DataUsageScreen(
             .background(Background)
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(20.dp)
+            .padding(Dimens.spaceXl)
     ) {
         Text(
             text = "Consumo de datos",
@@ -67,7 +69,7 @@ fun DataUsageScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.padding(6.dp))
+        Spacer(modifier = Modifier.padding(Dimens.spaceXs))
 
         if (state.loading) {
             Column(
@@ -79,7 +81,7 @@ fun DataUsageScreen(
             ) {
                 CircularProgressIndicator()
 
-                Spacer(modifier = Modifier.padding(6.dp))
+                Spacer(modifier = Modifier.padding(Dimens.spaceXs))
 
                 Text("Cargando consumo…")
             }
@@ -92,7 +94,7 @@ fun DataUsageScreen(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.spaceM)
                 ) {
                     SummaryCard(
                         title = "Hoy",
@@ -109,7 +111,7 @@ fun DataUsageScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.spaceM)
                 ) {
                     SummaryCard(
                         title = "Llamadas hoy",
@@ -144,7 +146,7 @@ fun DataUsageScreen(
             }
         }
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(Dimens.spaceS))
 
         AppPrimaryButton(
             text = "Actualizar",
@@ -154,7 +156,7 @@ fun DataUsageScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.padding(4.dp))
+        Spacer(modifier = Modifier.padding(Dimens.spaceXxs))
 
         AppPrimaryButton(
             text = "Limpiar registros",
@@ -164,7 +166,7 @@ fun DataUsageScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(Dimens.spaceS))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -186,7 +188,7 @@ private fun SummaryCard(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    OutlinedInfoCard(
+    AppCard(
         modifier = modifier
     ) {
         Column {
@@ -196,7 +198,7 @@ private fun SummaryCard(
                 style = MaterialTheme.typography.bodySmall
             )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(Dimens.spaceXxs))
 
             Text(
                 text = value,
@@ -214,19 +216,14 @@ private fun UsageGroupCard(
     rows: List<NetworkUsageGroupRow>,
     formatBytes: (Long) -> String
 ) {
-    OutlinedInfoCard(
+    AppCard(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Column {
-            Text(
-                text = title,
-                color = TextPrimary,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            SectionTitle(text = title)
 
-            Spacer(modifier = Modifier.padding(6.dp))
+            Spacer(modifier = Modifier.padding(Dimens.spaceXs))
 
             if (rows.isEmpty()) {
                 Text(
@@ -243,7 +240,7 @@ private fun UsageGroupCard(
 
                     if (index < rows.lastIndex) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp),
+                            modifier = Modifier.padding(vertical = Dimens.spaceS),
                             color = BorderGray
                         )
                     }
