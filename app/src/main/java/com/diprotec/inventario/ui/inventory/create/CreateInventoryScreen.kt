@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.DropdownMenu
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.theme.BorderGray
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.components.InventoryTopBar
 import com.diprotec.inventario.ui.components.inventoryTextFieldColors
@@ -69,7 +69,7 @@ fun CreateInventoryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 18.dp),
+                .padding(horizontal = Dimens.spaceXl, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -98,8 +98,8 @@ fun CreateInventoryScreen(
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth()
-                            .heightIn(min = 72.dp),
-                        shape = RoundedCornerShape(16.dp),
+                            .heightIn(min = Dimens.fieldTallHeight),
+                        shape = MaterialTheme.shapes.medium,
                         colors = inventoryTextFieldColors()
                     )
 
@@ -164,15 +164,15 @@ private fun InventoryDateInfo(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .heightIn(min = Dimens.fieldTallHeight)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
-                .background(White, RoundedCornerShape(16.dp))
-                .border(1.dp, BorderGray, RoundedCornerShape(16.dp))
-                .padding(horizontal = 16.dp, vertical = 18.dp)
+                .padding(top = Dimens.spaceS)
+                .background(White, MaterialTheme.shapes.medium)
+                .border(Dimens.borderThin, BorderGray, MaterialTheme.shapes.medium)
+                .padding(horizontal = Dimens.spaceL, vertical = 18.dp)
         ) {
             Text(
                 text = value,
@@ -186,7 +186,7 @@ private fun InventoryDateInfo(
             modifier = Modifier
                 .padding(start = 28.dp)
                 .background(Background)
-                .padding(horizontal = 4.dp)
+                .padding(horizontal = Dimens.spaceXxs)
         ) {
             FloatingFieldLabel(title)
         }
@@ -204,6 +204,6 @@ private fun FloatingFieldLabel(
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .background(Background)
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = Dimens.spaceXxs)
     )
 }
