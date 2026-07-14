@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.theme.Background
 import com.diprotec.inventario.ui.components.InventoryTopBar
 import com.diprotec.inventario.ui.components.OutlinedInfoCard
+import com.diprotec.inventario.ui.theme.Dimens
 import com.diprotec.inventario.ui.theme.TextPrimary
 
 @Composable
@@ -64,7 +65,7 @@ fun SyncLogScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 18.dp)
+                .padding(horizontal = Dimens.spaceXl, vertical = 18.dp)
         ) {
             if (logs.isEmpty()) {
                 Box(
@@ -81,7 +82,7 @@ fun SyncLogScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spaceM)
                 ) {
                     items(logs) { item ->
                         SyncLogCard(item)
@@ -97,8 +98,8 @@ private fun SyncLogCard(
     item: SyncLogUiItem
 ) {
     OutlinedInfoCard(
-        tonalElevation = 1.dp,
-        shadowElevation = 1.dp,
+        tonalElevation = Dimens.elevationS,
+        shadowElevation = Dimens.elevationS,
         modifier = Modifier
             .fillMaxWidth()
     ) {
@@ -113,7 +114,7 @@ private fun SyncLogCard(
                 color = TextPrimary
             )
 
-            Spacer(modifier = Modifier.size(8.dp))
+            Spacer(modifier = Modifier.size(Dimens.spaceS))
 
             Text(
                 text = "Evento: ${item.eventType}",
@@ -152,7 +153,7 @@ private fun SyncLogCard(
             )
 
             if (!item.message.isNullOrBlank()) {
-                Spacer(modifier = Modifier.size(8.dp))
+                Spacer(modifier = Modifier.size(Dimens.spaceS))
 
                 Text(
                     text = item.message,
