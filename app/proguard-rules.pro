@@ -53,6 +53,8 @@
 # Mantener todos los DTOs remotos usados por Retrofit/Moshi.
 # Esto es clave para evitar ERR_MODELO_INVALIDO en release.
 -keep class com.diprotec.inventario.data.remote.dto.** { *; }
+# ApiErrorResponse vive en core.network y lo parsea Moshi por reflexión.
+-keep class com.diprotec.inventario.core.network.ApiErrorResponse { *; }
 
 # Mantener adaptadores Moshi generados si en el futuro usas generateAdapter = true.
 -keep class **JsonAdapter { *; }
