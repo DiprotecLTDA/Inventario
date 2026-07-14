@@ -28,11 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.data.local.entity.InventoryItemEntity
-import com.diprotec.inventario.ui.theme.Background
-import com.diprotec.inventario.ui.theme.StatusError
+import com.diprotec.inventario.ui.components.AppCard
 import com.diprotec.inventario.ui.components.InventoryTopBar
-import com.diprotec.inventario.ui.components.OutlinedInfoCard
 import com.diprotec.inventario.ui.components.SegmentedToggle
+import com.diprotec.inventario.ui.theme.Background
+import com.diprotec.inventario.ui.theme.Dimens
+import com.diprotec.inventario.ui.theme.StatusError
 import com.diprotec.inventario.ui.theme.TextPrimary
 import java.util.Locale
 
@@ -98,7 +99,7 @@ fun InventoryListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 18.dp)
+                .padding(horizontal = Dimens.spaceXl, vertical = 18.dp)
         ) {
             Text(
                 text = "Inventario: ${uiState.inventoryName}",
@@ -142,7 +143,7 @@ fun InventoryListScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceL))
 
             if (uiState.isGrouped) {
                 LazyColumn(
@@ -222,13 +223,13 @@ private fun InventoryItemCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OutlinedInfoCard(
+    AppCard(
         modifier = modifier
             .fillMaxWidth(),
         onClick = onClick
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimens.spaceXs)
         ) {
             Text(
                 text = "Código: $barcode",
@@ -269,12 +270,12 @@ private fun InventoryGroupedCard(
     totalRows: Int,
     modifier: Modifier = Modifier
 ) {
-    OutlinedInfoCard(
+    AppCard(
         modifier = modifier
             .fillMaxWidth()
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimens.spaceXs)
         ) {
             Text(
                 text = "Código: $barcode",
