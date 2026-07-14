@@ -49,6 +49,7 @@ enum class FloatingMessageType {
 data class FloatingMessageEvent(
     val text: String,
     val type: FloatingMessageType = FloatingMessageType.INFO,
+    val durationMillis: Long? = null,
     val id: Long = System.nanoTime()
 )
 
@@ -62,28 +63,30 @@ object AppFloatingMessage {
 
     fun show(
         text: String,
-        type: FloatingMessageType = FloatingMessageType.INFO
+        type: FloatingMessageType = FloatingMessageType.INFO,
+        durationMillis: Long? = null
     ) {
         if (text.isBlank()) return
 
         _messages.tryEmit(
             FloatingMessageEvent(
                 text = text,
-                type = type
+                type = type,
+                durationMillis = durationMillis
             )
         )
     }
 
-    fun info(text: String) {
-        show(text, FloatingMessageType.INFO)
+    fun info(text: String, durationMillis: Long? = null) {
+        show(text, FloatingMessageType.INFO, durationMillis)
     }
 
-    fun success(text: String) {
-        show(text, FloatingMessageType.SUCCESS)
+    fun success(text: String, durationMillis: Long? = null) {
+        show(text, FloatingMessageType.SUCCESS, durationMillis)
     }
 
-    fun error(text: String) {
-        show(text, FloatingMessageType.ERROR)
+    fun error(text: String, durationMillis: Long? = null) {
+        show(text, FloatingMessageType.ERROR, durationMillis)
     }
 }
 
@@ -101,7 +104,7 @@ fun BoxScope.AppFloatingMessageHost(
         AppFloatingMessage.messages.collect { event ->
             currentMessage = event
 
-            delay(currentDuration)
+            delay(event.durationMillis ?: currentDuration)
 
             if (currentMessage?.id == event.id) {
                 currentMessage = null

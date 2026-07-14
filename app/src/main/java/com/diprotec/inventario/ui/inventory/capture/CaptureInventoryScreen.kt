@@ -64,7 +64,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diprotec.inventario.ui.common.AppFloatingMessage
-import com.diprotec.inventario.ui.common.AppFloatingMessageHost
 import com.diprotec.inventario.ui.scan.UnitechScan
 import com.diprotec.inventario.ui.theme.AppPrimaryButton
 import com.diprotec.inventario.ui.theme.Background
@@ -210,7 +209,10 @@ fun CaptureInventoryScreen(
         if (message == "Producto registrado") {
             val modeAtSuccess = uiState.scanMode
 
-            AppFloatingMessage.success(message)
+            AppFloatingMessage.success(
+                message,
+                durationMillis = PRODUCT_REGISTERED_MESSAGE_MS
+            )
 
             delay(PRODUCT_REGISTERED_MESSAGE_MS)
 
@@ -605,10 +607,6 @@ fun CaptureInventoryScreen(
                 )
             }
         }
-
-        AppFloatingMessageHost(
-            durationMillis = PRODUCT_REGISTERED_MESSAGE_MS
-        )
     }
 }
 
