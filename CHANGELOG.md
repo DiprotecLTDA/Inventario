@@ -32,6 +32,10 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
 - **`ui/theme/Shape.kt`** (`AppShapes`, radios 10/16/24 dp) y **`ui/theme/Dimens.kt`**
   (escala de espaciado, alturas, iconos, bordes y elevaciones).
 - Duración opcional por evento en los mensajes flotantes (`FloatingMessageEvent.durationMillis`).
+- **Biblioteca de componentes** en `ui/components/AppComponents.kt` (movida desde
+  `ui/theme/InventoryComponents.kt`): se suman `AppActionButton` (estilos `PRIMARY`/`SECONDARY`/
+  `OUTLINE`, con `icon` y `loading`), `AppCard`, `AppTextField`, `SectionTitle` y `StatusDot`,
+  construidos sobre los tokens (`Dimens`, `AppShapes`, `Color`, `Typography`).
 
 ### Cambiado
 - **Unificación de diseño**: botones, campos de texto, top-bars, tarjetas, chips de
@@ -74,6 +78,22 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   cada worker.
 - `Theme.kt` cablea `shapes = AppShapes` junto a `colorScheme` y `typography`.
 - Barra de estado, degradados y colores de estado alineados a los tokens canónicos.
+- **Versión de la aplicación fijada en `1.0.0`** (antes `1.4.2`), lo que deja el `versionCode`
+  en `10000` (antes `10402`). ⚠️ Al ser un `versionCode` **menor**, Android bloquea la
+  instalación sobre una 1.4.2 ya instalada: esos equipos requieren **desinstalar primero**.
+  Además, el chequeo de actualización compara contra la versión publicada en el backend: si
+  allí sigue anunciada la 1.4.2, un equipo con 1.0.0 verá "nueva versión" de forma permanente,
+  por lo que **la versión del backend debe bajarse en conjunto**.
+- **Nombre del APK generado**: `inventario-<versión>.apk` → `unitech_520_inventario_<versión>.apk`
+  (p. ej. `unitech_520_inventario_1.0.0.apk`). El nombre de la app instalada **no cambia**:
+  sigue siendo "Inventario" (`android:label="${appName}"` del flavor `free`).
+- **Login**: los mensajes se muestran únicamente como flotante. Se retiró el texto inline de
+  `LoginDesign`, que era UI muerta (el `LaunchedEffect` anulaba el mensaje de inmediato, así que
+  nunca alcanzaba a verse).
+- **Migración de las 10 pantallas a los tokens**: los literales `.dp` pasan a constantes de
+  `Dimens` y los radios 10/16/24 a `MaterialTheme.shapes.small/medium/large`, siempre con el
+  mismo valor (cero cambio visual). Los literales sin token semántico equivalente se
+  conservaron a propósito en lugar de forzar una equivalencia inexacta.
 
 ### Corregido
 - **Riesgo de pérdida de datos**: hueco de migración `26 → 27` que, con el fallback
@@ -119,6 +139,9 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
     y todas las dependencias `testImplementation`/`androidTestImplementation`
     (JUnit, MockK, Robolectric, Espresso, coroutines-test, compose ui-test) y los
     `debugImplementation` de `ui-test-manifest`.
+- `failureLogged` en `SyncService` (3 sitios): quedó muerto tras la migración al
+  `ApiCallExecutor` — se declaraba en `false` y ya nada lo ponía en `true`, por lo que
+  `if (!failureLogged)` era siempre verdadero. El `insertSyncLog` del `catch` se conserva.
 
 ### Seguridad
 - Firma de release externalizada a `keystore.properties` (ignorada); se agregó la
