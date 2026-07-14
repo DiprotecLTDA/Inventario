@@ -6,7 +6,8 @@ equipo (sin RFID). Está diseñada para operar **offline-first**: captura local 
 sincronización en segundo plano contra la API de Diprotec cuando hay conectividad.
 
 - **Paquete:** `com.diprotec.inventario`
-- **Versión:** 1.4.2
+- **Versión:** 1.0.0 (`versionCode` 10000)
+- **APK generado:** `unitech_520_inventario_1.0.0.apk`
 - **minSdk:** 26 · **targetSdk:** 30 · **compileSdk:** 34
 
 ---
@@ -124,16 +125,26 @@ visible en lugar de borrar datos no sincronizados.
 Requisitos: JDK 17, Android SDK (compileSdk 34).
 
 ```bash
-# Debug
+# Debug (sin minificar)
 ./gradlew assembleFreeDebug
 
-# Release firmada (requiere keystore.properties, ver abajo)
+# Release firmada y minificada con R8 (requiere keystore.properties, ver abajo)
 ./gradlew assembleFreeRelease
 ```
+
+El APK se genera como `unitech_520_inventario_<versión>.apk`. El nombre de la app instalada
+es **Inventario** (`android:label` del flavor `free`).
 
 > **Firma:** copia `keystore.properties.example` a `keystore.properties` (no se versiona)
 > y completa `storeFile`, `storePassword`, `keyAlias` y `keyPassword`. Sin ese archivo,
 > las builds de release se generan sin firmar.
+
+> ⚠️ **Valida siempre con `assembleFreeRelease` los cambios que toquen red, DTOs, Moshi o
+> reflexión.** En `debug` la minificación está desactivada (`isMinifyEnabled = false`), así que
+> los fallos causados por R8 **no se reproducen en debug**. Toda clase que Moshi deserialice por
+> reflexión necesita una regla `-keep` en `app/proguard-rules.pro`: hoy están cubiertos
+> `data.remote.dto.**` y `core.network.ApiErrorResponse`. Si agregas un DTO fuera de esos
+> paquetes, añade su regla o la app **crashea al iniciar solo en release**.
 
 ## Configuración inicial
 

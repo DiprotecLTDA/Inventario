@@ -119,6 +119,14 @@ Unificación visual y saneamiento de código de la edición Unitech (sin RFID).
   envolver, preservando la cancelación estructurada de corrutinas.
 - **Tipografía inconsistente**: `bodySmall` y `titleSmall` se usaban sin estar definidos y caían
   al default de Material (otra familia y tamaño). Ahora están declarados en la escala.
+- **Crash al iniciar en builds de release** (`FATAL EXCEPTION` en `MainActivity.onCreate`):
+  `ApiErrorResponse` vive en `core.network`, un paquete que no estaba cubierto por ninguna regla
+  de R8 (las existentes solo alcanzaban `data.remote.dto.**`). R8 ofuscaba sus propiedades
+  mientras el `@Metadata` de Kotlin conservaba los nombres originales, por lo que Moshi
+  reflexivo fallaba con *"No property for required constructor parameter #0 Estado"* al construir
+  el adaptador de forma eager en el `@Singleton`. Se agregó la regla `-keep` correspondiente en
+  `app/proguard-rules.pro`. Solo afectaba a `release`: en `debug` la minificación está
+  desactivada, por lo que no se reproducía.
 
 ### Eliminado
 - Código muerto verificado (0 usos): clúster `Barcode*`
