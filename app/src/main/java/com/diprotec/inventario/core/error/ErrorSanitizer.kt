@@ -32,7 +32,10 @@ object ErrorSanitizer {
     fun sanitize(text: String?): String? {
         if (text.isNullOrBlank()) return text
 
-        var result = text
+        // Tipado explícito (no inferido de `text: String?`): `result` se reasigna dentro de
+        // un lambda, y Kotlin no puede promover un `var` capturado por closure a no-nulo aunque
+        // aquí siempre lo sea; declararlo String de entrada evita el error de smart-cast.
+        var result: String = text
 
         SECRET_PATTERNS.forEach { (pattern, replacement) ->
             result = pattern.replace(result, replacement)
