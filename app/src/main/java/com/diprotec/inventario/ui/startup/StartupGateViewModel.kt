@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.error.operationError
 import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.data.local.dao.UserDao
@@ -113,7 +114,7 @@ class StartupGateViewModel @Inject constructor(
                     _state.value = _state.value.copy(
                         loading = false,
                         message = AppMessages.Startup.NO_SE_PUDO_VERIFICAR,
-                        error = t.message ?: AppMessages.Startup.NO_SE_PUDO_VERIFICAR,
+                        error = operationError("verificar la aplicación", t),
                         goLogin = false,
                         goMainMenu = false,
                         goSettings = false,
@@ -215,7 +216,7 @@ class StartupGateViewModel @Inject constructor(
                 _state.value = _state.value.copy(
                     loading = false,
                     message = AppMessages.Startup.NO_SE_PUDO_SINCRONIZAR_USUARIOS,
-                    error = t.message ?: AppMessages.Startup.NO_SE_PUDO_SINCRONIZAR_USUARIOS,
+                    error = operationError("sincronizar usuarios", t),
                     goLogin = false,
                     goMainMenu = false,
                     goSettings = false,

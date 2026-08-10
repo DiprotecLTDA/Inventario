@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
+import com.diprotec.inventario.core.error.operationError
 import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.network.AppConnectionMonitor
 import com.diprotec.inventario.data.remote.dto.VersionCheckDataDto
@@ -150,7 +151,7 @@ class AboutViewModel @Inject constructor(
                     state.value = state.value.copy(
                         loading = false,
                         versionCheck = null,
-                        errorMessage = t.message ?: AppMessages.About.NO_SE_PUDO_CONSULTAR_VERSION,
+                        errorMessage = operationError("consultar la versión", t),
                         successMessage = null,
                         hasNewVersion = false,
                         isMandatoryUpdate = false,

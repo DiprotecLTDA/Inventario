@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.service.ActivateDeviceService
 import com.diprotec.inventario.core.device.GetSerialNumber
+import com.diprotec.inventario.core.error.operationError
 import com.diprotec.inventario.core.key.DeviceKeyStoreManager
 import com.diprotec.inventario.core.key.DevicePublicKeyExporter
 import com.diprotec.inventario.core.key.KeyFileReader
@@ -217,7 +218,7 @@ class SettingsViewModel @Inject constructor(
             }.onFailure {
                 _state.value = _state.value.copy(
                     saving = false,
-                    errorMessage = it.message ?: AppMessages.Settings.ERROR_GUARDANDO_CONFIGURACION,
+                    errorMessage = operationError("guardar la configuración", it),
                     successMessage = null
                 )
             }.onSuccess {
