@@ -23,6 +23,8 @@ import com.diprotec.inventario.data.local.entity.InventoryItemEntity
 import com.diprotec.inventario.data.local.dao.InventoryRemoteDao
 import com.diprotec.inventario.data.local.entity.InventoryRemoteEntity
 import com.diprotec.inventario.data.local.entity.InventoryRemoteUserEntity
+import com.diprotec.inventario.data.local.dao.AppErrorDao
+import com.diprotec.inventario.data.local.entity.AppErrorEntity
 
 @Database(
     entities = [
@@ -36,9 +38,10 @@ import com.diprotec.inventario.data.local.entity.InventoryRemoteUserEntity
         InventoryRemoteEntity::class,
         InventoryRemoteUserEntity::class,
         SyncLogEntity::class,
-        NetworkUsageEntity::class
+        NetworkUsageEntity::class,
+        AppErrorEntity::class
     ],
-    version = 28,
+    version = 29,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -52,4 +55,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun inventarioRemotoDao(): InventoryRemoteDao
     abstract fun syncLogDao(): SyncLogDao
     abstract fun networkUsageDao(): NetworkUsageDao
+    abstract fun appErrorDao(): AppErrorDao
 }

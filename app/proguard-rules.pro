@@ -129,6 +129,25 @@
 
 
 # ============================================================
+# JavaMail / SMTP (reporte de errores por correo)
+# ============================================================
+
+# JavaMail carga proveedores por reflexión desde archivos META-INF/javamail.*;
+# sin estas reglas, R8 puede renombrar/eliminar clases que esos archivos referencian
+# por nombre y el envío falla solo en release (mismo tipo de problema visto con Moshi).
+-keep class javax.mail.** { *; }
+-keep class javax.activation.** { *; }
+-keep class com.sun.mail.** { *; }
+
+-dontwarn javax.mail.**
+-dontwarn javax.activation.**
+-dontwarn com.sun.mail.**
+
+# Entidad de la cola de errores, persistida y leída por reflexión por Room.
+-keep class com.diprotec.inventario.data.local.entity.AppErrorEntity { *; }
+
+
+# ============================================================
 # DataStore
 # ============================================================
 

@@ -19,6 +19,24 @@ val keystoreProperties = Properties().apply {
 }
 val hasSigningConfig = keystorePropertiesFile.exists()
 
+// Credencial SMTP para el reporte de errores por correo (opcional; sin ella el build
+// igual compila y el envío queda deshabilitado). Prioridad: variable de entorno
+// UNITECH_SMTP_PASSWORD -> propiedad Gradle -PunitechSmtpPassword -> unitechSmtpPassword
+// en local.properties (gitignored, nunca versionada) -> vacío.
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
+}
+
+val smtpPassword: String = System.getenv("UNITECH_SMTP_PASSWORD")
+    ?: (project.findProperty("unitechSmtpPassword") as String?)
+    ?: (localProperties["unitechSmtpPassword"] as String?)
+    ?: ""
+
+val smtpPasswordEscaped = smtpPassword.replace("\\", "\\\\").replace("\"", "\\\"")
+
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.incremental", "true")
@@ -43,6 +61,8 @@ android {
         targetSdk = 30
         versionCode = versionCodeResult
         versionName = versionNameString
+
+        buildConfigField("String", "SMTP_PASSWORD", "\"$smtpPasswordEscaped\"")
     }
 
     signingConfigs {
@@ -113,6 +133,16 @@ android {
         resources.excludes += "META-INF/NOTICE.md"
         resources.excludes += "META-INF/NOTICE"
         resources.excludes += "META-INF/LICENSE"
+
+        // com.sun.mail:android-mail y android-activation traen archivos de proveedores
+        // duplicados bajo META-INF/; sin esto el empaquetado falla con
+        // "More than one file was found with OS independent path".
+        resources.pickFirsts += "META-INF/javamail.providers"
+        resources.pickFirsts += "META-INF/javamail.default.providers"
+        resources.pickFirsts += "META-INF/javamail.address.map"
+        resources.pickFirsts += "META-INF/javamail.default.address.map"
+        resources.pickFirsts += "META-INF/mailcap"
+        resources.pickFirsts += "META-INF/mailcap.default"
     }
 
     compileOptions {
@@ -179,4 +209,8 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.6.0")
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Reporte de errores por correo (SMTP directo, sin backend de telemetría propio)
+    implementation("com.sun.mail:android-mail:1.6.7")
+    implementation("com.sun.mail:android-activation:1.6.7")
 }

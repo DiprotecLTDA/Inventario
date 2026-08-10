@@ -13,6 +13,7 @@ import com.diprotec.inventario.core.network.DynamicBaseUrlInterceptor
 import com.diprotec.inventario.core.network.NetworkUsageInterceptor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
 import com.diprotec.inventario.core.network.RawBodyLoggingInterceptor
+import com.diprotec.inventario.data.local.dao.AppErrorDao
 import com.diprotec.inventario.data.local.dao.InventoryDao
 import com.diprotec.inventario.data.local.dao.InventoryItemDao
 import com.diprotec.inventario.data.local.dao.InventoryRemoteDao
@@ -38,7 +39,12 @@ import com.diprotec.inventario.data.repository.UnitMeasureRepository
 import com.diprotec.inventario.data.repository.UnitMeasureRepositoryImpl
 import com.diprotec.inventario.data.repository.UserRepository
 import com.diprotec.inventario.data.repository.UserRepositoryImpl
+import com.diprotec.inventario.data.repository.AppErrorRepository
+import com.diprotec.inventario.data.repository.AppErrorRepositoryImpl
 import com.diprotec.inventario.service.AuthService
+import com.diprotec.inventario.service.email.EmailConfiguration
+import com.diprotec.inventario.service.email.KeystoreSmtpCredentialProvider
+import com.diprotec.inventario.service.email.SmtpCredentialProvider
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -174,6 +180,52 @@ object AppModule {
         }
     }
 
+    private val MIGRATION_28_29 = object : Migration(28, 29) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS app_errors (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    fingerprint TEXT NOT NULL,
+                    localState TEXT NOT NULL,
+                    createdAt INTEGER NOT NULL,
+                    lastSeenAt INTEGER NOT NULL,
+                    type TEXT NOT NULL,
+                    severity TEXT NOT NULL,
+                    module TEXT,
+                    action TEXT NOT NULL,
+                    message TEXT,
+                    stackTrace TEXT,
+                    endpoint TEXT,
+                    screen TEXT,
+                    inventoryId INTEGER,
+                    workerName TEXT,
+                    deviceManufacturer TEXT,
+                    deviceModel TEXT,
+                    deviceSerial TEXT,
+                    appVersionName TEXT,
+                    appVersionCode INTEGER,
+                    attemptCount INTEGER NOT NULL DEFAULT 0,
+                    sendError TEXT
+                )
+                """.trimIndent()
+            )
+
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_app_errors_fingerprint ON app_errors(fingerprint)"
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_app_errors_localState ON app_errors(localState)"
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_app_errors_createdAt ON app_errors(createdAt)"
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_app_errors_fingerprint_lastSeenAt ON app_errors(fingerprint, lastSeenAt)"
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDb(@ApplicationContext ctx: Context): AppDatabase =
@@ -181,7 +233,8 @@ object AppModule {
             .addMigrations(
                 MIGRATION_25_26,
                 MIGRATION_26_27,
-                MIGRATION_27_28
+                MIGRATION_27_28,
+                MIGRATION_28_29
             )
             .fallbackToDestructiveMigrationFrom(*(1..24).toList().toIntArray())
             .build()
@@ -217,6 +270,9 @@ object AppModule {
     @Provides
     fun provideNetworkUsageDao(db: AppDatabase): NetworkUsageDao =
         db.networkUsageDao()
+
+    @Provides
+    fun provideAppErrorDao(db: AppDatabase): AppErrorDao = db.appErrorDao()
 
     @Provides
     @Singleton
@@ -383,4 +439,19 @@ object AppModule {
         settings = settings,
         headersBuilder = headersBuilder
     )
+
+    @Provides
+    @Singleton
+    fun appErrorRepository(dao: AppErrorDao): AppErrorRepository =
+        AppErrorRepositoryImpl(dao)
+
+    @Provides
+    @Singleton
+    fun emailConfiguration(): EmailConfiguration = EmailConfiguration()
+
+    @Provides
+    @Singleton
+    fun smtpCredentialProvider(
+        @ApplicationContext context: Context
+    ): SmtpCredentialProvider = KeystoreSmtpCredentialProvider(context)
 }

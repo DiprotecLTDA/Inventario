@@ -78,6 +78,10 @@ fun AppNavHost(
         Log.d("STARTUP", "AppNavHost composed start=${Screen.StartupGate.route}")
     }
 
+    LaunchedEffect(currentRoute) {
+        CurrentScreenTracker.update(currentRoute)
+    }
+
     LaunchedEffect(loginRut, currentRoute) {
         val isPublicRoute =
             currentRoute == Screen.StartupGate.route ||
