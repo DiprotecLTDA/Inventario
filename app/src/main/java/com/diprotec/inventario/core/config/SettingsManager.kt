@@ -118,6 +118,24 @@ class SettingsManager @Inject constructor(
         deviceKeyAlias: String = this.deviceKeyAlias.value,
         deviceActivated: Boolean = this.deviceActivated.value
     ) {
+        // Actualiza el StateFlow en memoria ANTES de persistir en DataStore. El colector de
+        // start() reacciona a la emisión de store.settingsFlow de forma asíncrona: sin esto,
+        // código que lee settings.authToken.value inmediatamente después de save() (p.ej.
+        // ActivateDeviceService, llamado en el mismo onSave() de Settings) puede ver el valor
+        // VIEJO durante esa ventana, y el backend rechaza el token con 401/403 aunque el
+        // archivo importado sea válido.
+        applyImmediate(
+            baseUrl = normalizeBaseUrl(baseUrl),
+            empresaRut = empresaRut.trim(),
+            authToken = authToken.trim(),
+            apiKey = apiKey.trim(),
+            deviceSession = deviceSession.trim(),
+            deviceId = deviceId.trim(),
+            activationCode = activationCode.trim(),
+            deviceKeyAlias = deviceKeyAlias.trim(),
+            deviceActivated = deviceActivated
+        )
+
         store.save(
             baseUrl = baseUrl,
             empresaRut = empresaRut,
@@ -132,10 +150,12 @@ class SettingsManager @Inject constructor(
     }
 
     suspend fun saveDeviceSession(value: String) {
+        _deviceSession.value = value.trim()
         store.saveDeviceSession(value)
     }
 
     suspend fun saveDeviceId(value: String) {
+        _deviceId.value = value.trim()
         store.saveDeviceId(value)
     }
 
@@ -144,11 +164,42 @@ class SettingsManager @Inject constructor(
         deviceKeyAlias: String,
         deviceActivated: Boolean
     ) {
+        _activationCode.value = activationCode.trim()
+        _deviceKeyAlias.value = deviceKeyAlias.trim()
+        _deviceActivated.value = deviceActivated
+
         store.saveActivation(
             activationCode = activationCode,
             deviceKeyAlias = deviceKeyAlias,
             deviceActivated = deviceActivated
         )
+    }
+
+    private fun applyImmediate(
+        baseUrl: String,
+        empresaRut: String,
+        authToken: String,
+        apiKey: String,
+        deviceSession: String,
+        deviceId: String,
+        activationCode: String,
+        deviceKeyAlias: String,
+        deviceActivated: Boolean
+    ) {
+        _baseUrl.value = baseUrl
+        _empresaRut.value = empresaRut
+        _authToken.value = authToken
+        _apiKey.value = apiKey
+        _deviceSession.value = deviceSession
+        _deviceId.value = deviceId
+        _activationCode.value = activationCode
+        _deviceKeyAlias.value = deviceKeyAlias
+        _deviceActivated.value = deviceActivated
+    }
+
+    private fun normalizeBaseUrl(v: String): String {
+        val s = v.trim()
+        return if (s.endsWith("/")) s else "$s/"
     }
 
     suspend fun savePendingUpdate(
