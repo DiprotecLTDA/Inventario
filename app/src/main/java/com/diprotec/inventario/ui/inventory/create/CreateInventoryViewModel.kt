@@ -3,6 +3,7 @@ package com.diprotec.inventario.ui.inventory.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.auth.SuperAdminAccess
+import com.diprotec.inventario.core.concurrency.SingleFlightGuard
 import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
 import com.diprotec.inventario.data.local.entity.InventoryRemoteEntity
@@ -65,6 +66,8 @@ class CreateInventoryViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CreateInventoryUiState())
     val uiState: StateFlow<CreateInventoryUiState> = _uiState.asStateFlow()
+
+    private val createGuard = SingleFlightGuard()
 
     init {
         observeInventariosAsignados()
@@ -187,25 +190,31 @@ class CreateInventoryViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
-            val inventoryId = withContext(Dispatchers.IO) {
-                repository.createInventoryFromRemote(
-                    remote = InventoryRemoteEntity(
-                        id = selected.id.trim(),
-                        descripcion = selected.descripcion,
-                        fecha = selected.fecha,
-                        hora = selected.hora,
-                        desde = selected.desde,
-                        hasta = selected.hasta,
-                        rutAdministrador = selected.rutAdministrador,
-                        vigente = false,
-                        rutEmpresa = selected.rutEmpresa
-                    ),
-                    rutUsuario = rutUsuario
-                )
-            }
+        if (!createGuard.tryAcquire()) return
 
-            onCreated(inventoryId)
+        viewModelScope.launch {
+            try {
+                val inventoryId = withContext(Dispatchers.IO) {
+                    repository.createInventoryFromRemote(
+                        remote = InventoryRemoteEntity(
+                            id = selected.id.trim(),
+                            descripcion = selected.descripcion,
+                            fecha = selected.fecha,
+                            hora = selected.hora,
+                            desde = selected.desde,
+                            hasta = selected.hasta,
+                            rutAdministrador = selected.rutAdministrador,
+                            vigente = false,
+                            rutEmpresa = selected.rutEmpresa
+                        ),
+                        rutUsuario = rutUsuario
+                    )
+                }
+
+                onCreated(inventoryId)
+            } finally {
+                createGuard.release()
+            }
         }
     }
 

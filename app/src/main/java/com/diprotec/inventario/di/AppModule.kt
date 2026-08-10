@@ -8,6 +8,7 @@ import com.diprotec.inventario.BuildConfig
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.network.BaseUrlProvider
 import com.diprotec.inventario.core.network.ApiCallExecutor
+import com.diprotec.inventario.core.network.ConnectivityRetryInterceptor
 import com.diprotec.inventario.core.network.DynamicBaseUrlInterceptor
 import com.diprotec.inventario.core.network.NetworkUsageInterceptor
 import com.diprotec.inventario.core.network.ProtectedHeadersBuilder
@@ -242,10 +243,12 @@ object AppModule {
     @Provides
     @Singleton
     fun okHttp(
+        connectivityRetryInterceptor: ConnectivityRetryInterceptor,
         dynamicBaseUrlInterceptor: DynamicBaseUrlInterceptor,
         networkUsageInterceptor: NetworkUsageInterceptor
     ): OkHttpClient =
         OkHttpClient.Builder()
+            .addInterceptor(connectivityRetryInterceptor)
             .addInterceptor(dynamicBaseUrlInterceptor)
             .addInterceptor(networkUsageInterceptor)
             .connectTimeout(20, TimeUnit.SECONDS)

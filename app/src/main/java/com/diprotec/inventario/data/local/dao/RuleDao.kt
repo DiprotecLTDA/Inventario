@@ -28,4 +28,7 @@ interface RuleDao {
 
     @Query("SELECT COUNT(*) FROM reglas")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM reglas WHERE rutEmpresa = :rutEmpresa")
+    suspend fun findByEmpresa(rutEmpresa: String): List<RuleEntity>
 }

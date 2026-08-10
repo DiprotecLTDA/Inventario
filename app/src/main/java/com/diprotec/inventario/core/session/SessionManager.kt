@@ -19,6 +19,9 @@ class SessionManager @Inject constructor(
     private val _perfilId = MutableStateFlow<Int?>(null)
     val perfilId: StateFlow<Int?> = _perfilId
 
+    @Volatile
+    private var lastActivityWriteAt: Long = 0L
+
     val sessionLastActivityAt: StateFlow<Long>
         get() = settings.sessionLastActivityAt
 
@@ -120,7 +123,12 @@ class SessionManager @Inject constructor(
             _perfilId.value = settings.sessionPerfilId.value
         }
 
-        settings.updateUserSessionActivity(now)
+        // Throttle: evita escribir a DataStore en cada toque; una vez por segundo alcanza
+        // para mantener la sesión viva sin generar I/O excesivo ante interacción continua.
+        if (now - lastActivityWriteAt >= ACTIVITY_WRITE_THROTTLE_MS) {
+            lastActivityWriteAt = now
+            settings.updateUserSessionActivity(now)
+        }
 
         return true
     }
@@ -142,5 +150,6 @@ class SessionManager @Inject constructor(
 
     companion object {
         private val MAX_SESSION_MS = TimeUnit.HOURS.toMillis(3)
+        private const val ACTIVITY_WRITE_THROTTLE_MS = 1_000L
     }
 }

@@ -2,7 +2,10 @@ package com.diprotec.inventario.ui.inventory.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.message.AppMessages
+import com.diprotec.inventario.core.session.SessionManager
+import com.diprotec.inventario.data.local.dao.RuleDao
 import com.diprotec.inventario.data.local.entity.InventoryItemEntity
 import com.diprotec.inventario.data.local.inventory.InventoryGroupedRow
 import com.diprotec.inventario.data.local.inventory.InventoryStatus
@@ -31,7 +34,10 @@ data class InventoryListUiState(
 
 @HiltViewModel
 class InventoryListViewModel @Inject constructor(
-    private val repository: InventoryRepository
+    private val repository: InventoryRepository,
+    private val ruleDao: RuleDao,
+    private val settings: SettingsManager,
+    private val session: SessionManager
 ) : ViewModel() {
 
     private val groupedMode = MutableStateFlow(false)
@@ -46,11 +52,14 @@ class InventoryListViewModel @Inject constructor(
             repository.observeInventoryItems(inventoryId),
             repository.observeGroupedInventoryItems(inventoryId),
             flow {
-                emit(repository.getInventoryById(inventoryId))
+                val inventory = repository.getInventoryById(inventoryId)
+                val ruleAllowsDelete = ruleAllowsDeleteForCurrentUser()
+                emit(inventory to ruleAllowsDelete)
             }.flowOn(Dispatchers.IO)
-        ) { isGrouped, ungrouped, grouped, inventory ->
+        ) { isGrouped, ungrouped, grouped, inventoryAndRule ->
+            val (inventory, ruleAllowsDelete) = inventoryAndRule
             val inventoryStatus = inventory?.status.orEmpty()
-            val canDeleteItems = inventoryStatus != InventoryStatus.FINISHED.name
+            val canDeleteItems = inventoryStatus != InventoryStatus.FINISHED.name && ruleAllowsDelete
 
             InventoryListUiState(
                 isGrouped = isGrouped,
@@ -66,6 +75,33 @@ class InventoryListViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = InventoryListUiState()
         )
+    }
+
+    /**
+     * Un usuario puede eliminar capturas ya sincronizadas si la regla de negocio de su perfil
+     * (o, en su defecto, la regla genérica de la empresa) lo autoriza. Si la empresa no tiene
+     * ninguna regla configurada (catálogo `reglas` vacío o no aplicable), se permite por
+     * defecto para no bloquear el flujo de un cliente que no usa ese catálogo.
+     */
+    private suspend fun ruleAllowsDeleteForCurrentUser(): Boolean {
+        val rutEmpresa = settings.empresaRut.value.trim()
+        if (rutEmpresa.isBlank()) return true
+
+        val reglas = ruleDao.findByEmpresa(rutEmpresa)
+        if (reglas.isEmpty()) return true
+
+        val perfilId = session.perfilId.value?.toString()
+
+        val regla = reglas.firstOrNull { it.perfil == perfilId }
+            ?: reglas.firstOrNull { it.perfil.isNullOrBlank() }
+            ?: return true
+
+        return regla.vigente && regla.eliminaEnviados == RULE_ELIMINA_ENVIADOS_PERMITIDO
+    }
+
+    private companion object {
+        // Convención del backend: "0" = la regla permite eliminar capturas ya enviadas.
+        private const val RULE_ELIMINA_ENVIADOS_PERMITIDO = "0"
     }
 
     fun deleteItem(

@@ -9,9 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.diprotec.inventario.core.config.SettingsManager
 import com.diprotec.inventario.core.message.AppMessages
 import com.diprotec.inventario.core.session.SessionManager
-import com.diprotec.inventario.data.local.dao.LocationDao
-import com.diprotec.inventario.data.local.dao.RuleDao
-import com.diprotec.inventario.data.local.dao.UnitMeasureDao
 import com.diprotec.inventario.data.local.dao.UserDao
 import com.diprotec.inventario.service.SyncService
 import com.diprotec.inventario.worker.CatalogSyncWorker
@@ -40,9 +37,6 @@ class StartupGateViewModel @Inject constructor(
     private val session: SessionManager,
     private val sync: SyncService,
     private val userDao: UserDao,
-    private val locationDao: LocationDao,
-    private val ruleDao: RuleDao,
-    private val unitMeasureDao: UnitMeasureDao,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -240,10 +234,10 @@ class StartupGateViewModel @Inject constructor(
     }
 
     private suspend fun canWorkOffline(): Boolean = withContext(Dispatchers.IO) {
-        userDao.countUsers() > 0 &&
-                locationDao.count() > 0 &&
-                ruleDao.count() > 0 &&
-                unitMeasureDao.count() > 0
+        // Solo se exige que existan usuarios sincronizados (o de una sesión previa).
+        // Catálogos vacíos (reglas/ubicaciones/productos/unidades) no bloquean el ingreso
+        // offline: se sincronizan best-effort cuando vuelva la red.
+        userDao.countUsers() > 0
     }
 
     private fun showOfflineOption(

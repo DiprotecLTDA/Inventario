@@ -175,6 +175,10 @@ class VersionService @Inject constructor(
         val cleanPath = apkRelativePath.trimEnd('/')
         val cleanFileName = apkFileName.trimStart('/')
 
-        return "$cleanPath/$cleanFileName"
+        return if (cleanPath.endsWith(cleanFileName)) {
+            cleanPath
+        } else {
+            "$cleanPath/$cleanFileName"
+        }
     }
 }
